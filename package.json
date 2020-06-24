@@ -1,0 +1,19 @@
+{
+  "name": "whiskse",
+  "version": "1.0.0",
+  "description": "Whisk.se Website",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stebunting/whiskse.git"
+  },
+  "author": "Steve Bunting",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stebunting/whiskse/issues"
+  },
+  "homepage": "https://github.com/stebunting/whiskse#readme"
+}

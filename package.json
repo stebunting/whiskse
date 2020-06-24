@@ -4,6 +4,7 @@
   "description": "Whisk.se Website",
   "main": "app.js",
   "scripts": {
+    "dev": "nodemon app",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,36 @@
   "bugs": {
     "url": "https://github.com/stebunting/whiskse/issues"
   },
-  "homepage": "https://github.com/stebunting/whiskse#readme"
+  "homepage": "https://github.com/stebunting/whiskse#readme",
+  "dependencies": {
+    "bootstrap": "^4.5.0",
+    "debug": "^4.1.1",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.3",
+    "express": "^4.17.1",
+    "jquery": "^3.5.1"
+  },
+  "nodemonConfig": {
+    "restartable": "rs",
+    "ignore": [
+      "node_modules/**/node_modules"
+    ],
+    "env": {
+      "NODE_ENV": "development",
+      "PORT": 3000,
+      "DEBUG": "whiskse,whiskse:*",
+      "DEBUG_DEPTH": 3
+    }
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.4.0",
+    "@typescript-eslint/parser": "^3.4.0",
+    "eslint": "^7.3.1",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-react-hooks": "^4.0.4"
+  }
 }

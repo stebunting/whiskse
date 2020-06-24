@@ -1,0 +1,67 @@
+</div>
+
+<div class="footer">
+  <div class="row">
+    <div class="col-md-4 col-8">
+      <div id="map"></div>
+    </div>
+    <div class="col-md-4 col-4 contact">
+      <h4>VISIT US AT OUR BOUTIQUE</h4>
+      <p>
+        Vikingagatan 18<br />
+        113 42 Stockholm<br />
+        <img class="icon" src="/icons/phone.png" alt="Call us!" />073-141 65 85<br />
+        <img class="icon" src="/icons/email.png" alt="E-mail us!" />hello (at) whisk.se
+      </p>
+
+      <h4>OPENING HOURS</h4>
+      <p>By Appointment - café opening soon</p>
+
+      <h4>VISIT US ONLINE</h4>
+      <ul id="social" class="nav">
+        <li><a id="instagram" href="https://www.instagram.com/whisk_stklm/" target="_blank" rel="external"></a></li>
+        <li><a id="facebook" href="https://www.facebook.com/WhiskStockholm/" target="_blank" rel="external"></a></li>
+      </ul>
+
+    </div>
+    <div class="col-md-4 col-12 latest-instagram-holder">
+      <div class="row latest-instagram" id="instagram-images-header">
+        <h4>LATEST FROM INSTAGRAM</h4>
+      </div>
+      <div class="row">
+        <div class="green-hosting">
+          Powered by Green Hosting
+          <a href="https://www.green-hosting.co.uk" target="_blank" rel="external">&nbsp;
+            <img src="/icons/green-hosting.png" width="28" alt="Green Hosting Windmill" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- JQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Whisk JS -->
+<script src="/js/whisk.js"></script>
+<% if (page === 'treatboxes') { %>
+<script src="/js/date.format.js"></script>
+<script src="/js/form-verification.js"></script>
+<script src="/js/treatboxes.js" type="module"></script>
+<% } else if (page === 'treatbox-confirm') { %>
+<script src="/js/treatbox-confirm.js"></script>
+<% } %>
+
+<!-- Google Maps JS -->
+<script src="/js/googlemap.js"></script>
+<% if (page === 'treatboxes') { %>
+<script src="https://maps.googleapis.com/maps/api/js?key=<%=apiKey %>&libraries=places,geometry&callback=initMap"></script>
+<% } else { %><script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=apiKey %>&callback=initMap"></script>
+<% } %>
+
+<!-- Bootstrap Required JS -->
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

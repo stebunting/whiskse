@@ -1,0 +1,642 @@
+/********************************** GENERAL ***********************************/
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+
+@font-face {
+  font-family: "Bebasneue";
+  src: url("/fonts/BebasNeue-Regular.woff2") format('woff2'),
+       url("/fonts/BebasNeue-Regular.woff") format('woff'),
+       url("/fonts/BebasNeue-Regular.ttf") format('truetype'),
+       url("/fonts/BebasNeue-Regular.otf") format('opentype'),
+       url("/fonts/BebasNeue-Regular.eot") format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bebasneue";
+  src: url("/fonts/BebasNeue-Bold.ttf") format('truetype'),
+       url("/fonts/BebasNeue-Bold.otf") format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bebasneue";
+  src: url("/fonts/BebasNeue-Light.ttf") format('truetype'),
+       url("/fonts/BebasNeue-Light.otf") format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bebasneue Thin";
+  src: url("/fonts/BebasNeue-Thin.ttf") format('truetype'),
+       url("/fonts/BebasNeue-Thin.otf") format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  padding-top: 140px;
+  font-size: 90%;
+  color: #282828;
+  text-align: justify;
+}
+
+.container-fluid {
+	padding: 0px 10vw;
+}
+
+a:link, a:hover, a:visited, a:active {
+  color: #548c4e;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+h1, h2, h3, h4 {
+  font-family: Bebasneue, Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+
+h1 {
+  margin: 0px 0px 40px 0px;
+  padding: 30px 0px 19px;
+  font-size: 4em;
+  text-align: center;
+  border-width: 2px 0px;
+  border-color: #7c7c7c;
+  border-style: solid;
+}
+
+h2 {
+  padding-top: 40px;
+  font-size: 1.8em;
+}
+
+h3 {
+  padding-top: 0px;
+  margin-bottom: 0px;
+  font-size: 1.4em;
+  text-align: center;
+}
+
+h4 {
+  font-size: 1.4em;
+  margin-bottom: 0px;
+}
+
+.btn-xl, .btn-xl:hover {
+  color: #ffffff;
+  border: 2px #ffffff solid;
+  padding: 20px 120px;
+  font-size: 16px;
+  border-radius: 0px;
+  opacity: 0.8;
+}
+
+/*********************************** NAVBAR ***********************************/
+.navbar-nav {
+  height: 70px;
+  display: table;
+}
+
+.nav-item {
+  font-family: Bebasneue, Arial, Helvetica, sans-serif;
+  font-weight: 300;
+  font-size: 1.5em;
+  letter-spacing: 0.05em;
+  line-height: 1em;
+  width: 122px;
+  height: 100%;
+  padding: 2px;
+  text-align: center;
+  margin: auto;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.navbar-brand {
+  padding: 10px 10px;
+}
+
+ul.nav li.nav-item a.nav-link:link, a.nav-link:visited, a.nav-link: active {
+  color: #7c7c7c;
+}
+
+.nav-item:hover {
+  font-weight: bold;
+  padding: 0px;
+  border-width: 2px 0px;
+  border-style: solid;
+  border-color: #7c7c7c;
+}
+
+ul.nav li.nav-item a.nav-link:hover {
+  color: #7c7c7c;
+}
+
+span.nav-span {
+  display: inline-block;
+  font-weight: 300;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .nav-item:hover {
+    border-width: 0px;
+    font-weight: normal;
+  }
+
+  .nav-item {
+    display: block;
+    text-align: left;
+    width: 100%;
+  }
+
+  .ml-auto {
+    margin-left: 0px !important;
+  }
+
+  .navbar-nav {
+    height: 100%;
+  }
+}
+
+/*********************************** INDEX ************************************/
+.header-outer {
+  position: relative;
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 0;
+  padding-top: 50%;
+}
+
+.header-inner {
+  position: absolute;
+  top: 15vw;
+  font-family: Bebasneue, Arial, Helvetica, sans-serif;
+  font-weight: 300;
+  text-align: center;
+  color: #242424;
+}
+
+.header1-img {
+  background-image: url('images/indexbanner1.png');
+}
+
+.header1-text {
+  font-size: 9vw;
+  left: 0;
+  right: 0;
+}
+
+.header2-img {
+  background-image: url('images/indexbanner2.png');
+}
+
+.header2-text {
+  font-size: 5vw;
+  left: 10vw;
+  right: 10vw;
+}
+
+/****************************** INDEX - PARALLAX ******************************/
+.paral {
+  min-height: 0px;
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: 50% 50%;
+  height: 450px;
+}
+
+.paralsec {
+  background-image: url("/images/parallax.jpg");
+}
+
+.paral h1 {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 60px;
+  text-align: center;
+}
+
+.paral p {
+  color:#f5f5f5;
+  text-align: center;
+}
+
+/************************************ MENU ************************************/
+.menu-text {
+  text-align: center;
+  padding: 0px 5vw;
+}
+
+.menu-text-regulars {
+  padding-left: 0px;
+}
+
+.regular-header {
+  font-family: Bebasneue, Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 1.4em;
+  text-align: center;
+  text-transform: uppercase;
+  vertical-align: middle;
+  padding: 0px;
+}
+
+.rotate {
+  transform: rotate(-60deg);
+  -webkit-transform: rotate(-60deg);
+  -moz-transform: rotate(-60deg);
+  -ms-transform: rotate(-60deg);
+  -o-transform: rotate(-60deg);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.regular-description {
+  text-align: left;
+  font-size: 0.9em;
+  margin: 0px;
+  list-style-type: none;
+  line-height: 1.3em;
+  padding: 4px 0px;
+}
+
+.regular-list {
+  padding-left: 0px;
+  margin: 10px 0px;
+}
+
+.menu-img {
+  width: 100%;
+}
+
+.no-padding {
+  padding: 0px;
+}
+
+.pricelist {
+  background-color: #f0f0f0;
+  padding: 50px 50px 90px;
+  margin-bottom: 1em;
+}
+
+.accessories {
+  background-color: #e1f5e3;
+  margin-top: 10px;
+  padding: 50px 50px 90px;
+}
+
+@media (max-width:768px) {
+	.pricelist, .accessories {
+		padding: 20px 20px 40px;
+	}
+}
+
+.pricelist_item {
+  width: 10em;
+  text-align: right;
+  vertical-align: top;
+}
+
+.pricelist_price {
+  text-align: left;
+  padding-left: 20px;
+}
+
+.pricelist-details {
+  font-size: 0.8em;
+  color: #705050;
+}
+
+.asterisk {
+  font-size: 0.7em;
+}
+
+.imgcomingsoon {
+  background-color: #f0f0f0;
+  height: 70vh;
+}
+
+.viewCakeImage {
+  font-size: 0.8em;
+}
+
+.cake-guide {
+  width: 100%;
+}
+
+/****************************** CUSTOM CREATIONS ******************************/
+.text-opener {
+  margin: 50px 0px;
+}
+
+/******************************* OUR PHILOSOPHY *******************************/
+.philosophy {
+  text-align: justify;
+}
+
+.philosophy-img {
+  margin: 0px 0px 30px 30px;
+  width: 500px;
+}
+
+.philosophy li {
+  padding-top: 10px;
+}
+
+.want-to-learn-more {
+  padding: 10px 50px 50px;
+  background-color: #cbcccc;
+}
+
+.links {
+  list-style-type: none;
+  padding-left: 5vh;
+}
+
+@media (max-width: 768px) {
+	.links {
+		padding-left: 2vh;
+	}
+}
+
+ul.links li a:link, ul.links li a:visited, ul.links li a:hover, ul.links li a:active {
+  color: #ffffff;
+}
+
+.rrr {
+  text-align: center;
+}
+
+/************************************ FAQ *************************************/
+.btn-group {
+  width: 100%;
+}
+
+.btn {
+  text-align: left;
+}
+
+.faq-btn {
+  width: 100%;
+}
+
+.card-header {
+  background-color: #ffffff;
+  border-width: 0px;
+}
+
+.card {
+  border-color: #000000;
+  border-width: 0px 0px 1px 0px;
+  border-radius: 0px;
+  padding: 10px;
+}
+
+@media (max-width: 768px) {
+	.card {
+		padding: 0px;
+	}
+}
+
+.card-top {
+  border-top-width: 1px;
+}
+
+.delivery-place {
+  width: 12em;
+}
+
+/******************************** TREAT BOXES *********************************/
+.treatbox-form {
+  width: 640px;
+  height: 2980px;
+  border: 0px;
+  margin: auto;
+  display: block;
+}
+
+/*********************************** FOOTER ***********************************/
+.footer {
+  padding: 60px 30px 20px;
+}
+
+.contact {
+  font-size: 0.8em;
+  padding: 0px;
+}
+
+.mapouter {
+  position: relative;
+  text-align: right;
+  height: 200px;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+.gmap_canvas {
+  overflow: hidden;
+  background: none;
+  height: 200px;
+  width: 100%;
+  border-width: 0px;
+  padding: 0px;
+  margin: 0px;
+}
+
+#social li {
+  padding: 2px 10px 2px 0px;
+  margin: 0px;
+}
+
+#social a {
+  display: inline-block;
+  height: 29px;
+}
+
+#instagram {
+  width: 29px;
+  padding: 2px 7px;
+  background:transparent url('/icons/instagram_bw.png') center top no-repeat;
+}
+
+#instagram:hover {
+  background-image: url('/icons/instagram_colour.png');
+}
+
+#facebook {
+  width: 29px;
+  padding: 2px 7px;
+  background:transparent url('/icons/facebook_bw.png') center top no-repeat;
+}
+
+#facebook:hover {
+  background-image: url('/icons/facebook_colour.png');
+}
+
+.instagram_thumb {
+  padding: 0px 4px 4px 0px;
+  margin: 0px;
+  width: 80px;
+  height: 80px;
+}
+
+.icon {
+  margin-right: 5px;
+}
+
+#map {
+  width: 100%;
+  height: 200px;
+  background-color: red;
+}
+
+.green-hosting {
+  width: 100%;
+  font-size: 0.7em;
+  color: #505050;
+  font-style: italic;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+	.latest-instagram {
+  	display: -ms-flexbox !important;
+  	display: flex !important;
+		-ms-flex-pack: center !important;
+		justify-content: center !important;
+	}
+
+	.latest-instagram-holder {
+		padding-top: 4vh;
+	}
+
+	.green-hosting {
+		padding-top: 4vh;
+	}
+}
+
+/* NEW FORM */
+fieldset {
+  border: 1px black solid;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+legend.col-form-label {
+  text-align: right;
+}
+
+legend {
+    width: auto;
+    padding: 0 10px;
+    border-bottom: none;
+}
+
+.item-button {
+  margin: 5px 5px;
+}
+
+#split-delivery-buttons {
+  display: none;
+}
+
+label {
+  text-align: right;
+}
+
+#user-delivery {
+  display: none;
+}
+
+#delivery-type {
+  margin-bottom: 15px;
+}
+
+textarea {
+  resize: none;
+}
+
+select {
+  width: auto;
+}
+
+.total-to-pay-text {
+  font-weight: bold;
+}
+
+.delivery-img {
+  width: 100%;
+}
+
+.delivery-icon {
+  width: 24px;
+}
+
+.icon-button {
+  margin: 8px 20px;
+  padding: 0px;
+  font-style: italic;
+}
+
+#date-selector, #product-selector, #purchaser-details, #delivery-details, #submit-fieldset {
+  display: none;
+}
+
+#loading-div {
+  text-align: center;
+}
+
+.loading-icon {
+  width: 200px;
+}
+
+.order-item {
+  width: 35%;
+}
+
+.order-quantity {
+  width: 15%;
+  text-align: right;
+}
+
+.order-price, .order-subtotal {
+  width: 25%;
+  text-align: right;
+}
+
+.order-total {
+  text-align: right;
+}
+
+.table-label {
+  width: 35%;
+}
+
+.error-message {
+  color: #FF0000;
+}
+
+.open-swish {
+  font-weight: bold;
+  display: none;
+}
+
+#message-rebate-code {
+  color: #FF0000;
+  display: none;
+}
+
+.treatbox-form-header {
+  text-align: center;
+}
+
+.treatbox-info {
+  margin-top: 1.6em;
+}

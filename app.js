@@ -20,11 +20,9 @@ app.use('/js', express.static(path.join(__dirname, 'node_modules', 'jquery', 'di
 app.set('views', './src/views');
 
 // Entry Point
-app.get('/', (req, res) => {
-  res.render('index', {
-    apiKey: process.env.GOOGLE_API_KEY
-  });
-});
+app.get('/', (req, res) => res.render('index', {
+  apiKey: process.env.GOOGLE_API_KEY
+}));
 
 // Start Server
 app.listen(port, () => {

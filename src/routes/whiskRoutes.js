@@ -20,6 +20,9 @@ function routes() {
   whiskRoutes.route('/custom')
     .get((req, res) => res.render('custom', { googleApiKey, page: 'custom' }));
 
+  whiskRoutes.route('/philosophy')
+    .get((req, res) => res.render('philosophy', { googleApiKey, page: 'philosophy' }));
+
   return whiskRoutes;
 }
 

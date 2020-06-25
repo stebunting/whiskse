@@ -8,6 +8,7 @@ const debug = require('debug')(tag);
 // Constants
 const googleApiKey = process.env.GOOGLE_API_KEY;
 
+// Routes
 function routes() {
   const whiskRoutes = express.Router();
 

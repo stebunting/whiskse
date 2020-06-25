@@ -57,8 +57,8 @@
 <!-- Google Maps JS -->
 <script src="/js/googlemap.js"></script>
 <% if (page === 'treatboxes') { %>
-<script src="https://maps.googleapis.com/maps/api/js?key=<%=apiKey %>&libraries=places,geometry&callback=initMap"></script>
-<% } else { %><script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=apiKey %>&callback=initMap"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&libraries=places,geometry&callback=initMap"></script>
+<% } else { %><script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&callback=initMap"></script>
 <% } %>
 
 <!-- Bootstrap Required JS -->

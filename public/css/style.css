@@ -297,13 +297,13 @@ span.nav-span {
 	}
 }
 
-.pricelist_item {
+.pricelist-item {
   width: 10em;
   text-align: right;
   vertical-align: top;
 }
 
-.pricelist_price {
+.pricelist-price {
   text-align: left;
   padding-left: 20px;
 }
@@ -322,7 +322,7 @@ span.nav-span {
   height: 70vh;
 }
 
-.viewCakeImage {
+.view-cake-image {
   font-size: 0.8em;
 }
 

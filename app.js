@@ -19,10 +19,10 @@ app.use('/js', express.static(path.join(__dirname, 'node_modules', 'bootstrap', 
 app.use('/js', express.static(path.join(__dirname, 'node_modules', 'jquery', 'dist')));
 app.set('views', './src/views');
 
-// Entry Point
-app.get('/', (req, res) => res.render('index', {
-  apiKey: process.env.GOOGLE_API_KEY
-}));
+// Routing
+const whiskRouter = require('./src/routes/whiskRoutes')();
+
+app.use('/', whiskRouter);
 
 // Start Server
 app.listen(port, () => {

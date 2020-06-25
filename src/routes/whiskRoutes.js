@@ -23,6 +23,9 @@ function routes() {
   whiskRoutes.route('/philosophy')
     .get((req, res) => res.render('philosophy', { googleApiKey, page: 'philosophy' }));
 
+  whiskRoutes.route('/faq')
+    .get((req, res) => res.render('faq', { googleApiKey, page: 'faq' }));
+
   return whiskRoutes;
 }
 

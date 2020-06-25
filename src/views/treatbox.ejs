@@ -1,0 +1,223 @@
+<%-include('partials/header', {
+  page,
+  title: 'Whisk Treat Boxes',
+  headerDisplay: false
+}); %>
+  <script>
+    var postData = []; // <?php print(json_encode($_POST)); ?>;
+  </script>
+
+  <h2 class="treatbox-form-header">Your Weekly Wednesday Delivery of Sweet Treats and Lilla Laback Organic Vegetables</h2>
+
+  <h3 class="treatbox-info">THE BOXES</h3>
+  <ul>
+    <li>Treat Box is 250kr // contains 4 strawberry and elderflower cupcakes and 4 Vienesse whirls</li>
+    <li>Veggie Box is 250kr // contains a mixture of fresh organic vegetables, edible flowers and herbs all picked at local farm <a href="http://www.lillalaback.se/" target="_blank" rel="external">Lilla Labäck</a> who supplies the best restaurants in the city</li>
+    <li>Combo Box is 490kr // contains all the delicious things in both the Treat Box and the Veggie box</li>
+  </ul>
+
+  <h3 class="treatbox-info">ORDER DEADLINES</h3>
+  <p>Veggie Box and Combo Box-  9am Saturday // Treat Box - 10am Tuesday</p>
+
+  <h3 class="treatbox-info">PICK UP AND DELIVERY</h3>
+  <p>
+    Delivery is only available for Treat Boxes and Combo boxes. Veggie Boxes can be picked up at our store at Vikingagatan 18 between 10:30-11:30 on Wednesday.<br />
+    Delivery for Zone 1 is free. There is an additional 50kr charge to cover delivery to Zone 2<br />
+    (Please see the map to see which zone the delivery falls under)
+  </p>
+  <div>
+  	<button type="button" class="btn icon-button btn-sm" data-toggle="modal" data-target="#deliveryZoneModal"><img class="delivery-icon" src="/icons/zone-map.png" alt="Delivery Zones" /> Delivery Zones</button>
+  </div>
+
+  <div id="loading-div">
+    <img class="loading-icon" src="/icons/loading.gif" alt="Loading" />
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="deliveryZoneModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content"> 
+        <div class="modal-body">
+          <a href="/images/delivery-zones.jpg" target="_blank"><img class="delivery-img" src="images/delivery-zones.jpg" alt="Delivery Zones" /></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <form method="post" form-validation="true" id="treatbox-form" autocomplete="off">
+    <fieldset class="form-group" id="date-selector">
+      <legend>When do you want to order for?</legend>
+      <div class="form-group row">
+        <div class="col-sm-10 offset-md-1 form-group">
+          <select class="form-control form-control-sm" id="date" name="date"></select>
+          <input type="hidden" id="date-text" name="date-text" value="" />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="form-group" id="product-selector">
+      <legend>What would you like to buy?</legend>
+      <div class="form-group row">
+        <label class="col-sm-4" for="num-comboboxes">Combo Boxes</label>
+        <div class="col-sm-2 form-group">
+          <select class="form-control form-control-sm" id="num-comboboxes" name="num-comboboxes"><%
+            for (let i = 0; i < 10; i += 1) { %>
+            <option value="<%=i %>"><%=i %></option><% } %>
+          </select>
+        </div>
+        <div class="col-sm-6"><span id="combo-box-price"></span>&nbsp;SEK</div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-4" for="num-treatboxes">Treat Boxes</label>
+        <div class="col-sm-2 form-group">
+          <select class="form-control form-control-sm" id="num-treatboxes" name="num-treatboxes"><%
+            for (let i = 0; i < 10; i += 1) { %>
+            <option value="<%=i %>"><%=i %></option><% } %>
+          </select>
+        </div>
+        <div class="col-sm-6"><span id="treat-box-price"></span>&nbsp;SEK</div>
+      </div>
+
+      <div class="form-group row">
+        <label class="col-sm-4" for="num-vegetableboxes">Vegetable Boxes<br />[pick up only]</label>
+        <div class="col-sm-2 form-group">
+          <select class="form-control form-control-sm" id="num-vegetableboxes" name="num-vegetableboxes"><%
+            for (let i = 0; i < 10; i += 1) { %>
+            <option value="<%=i %>"><%=i %></option><% } %>
+          </select>
+        </div>
+        <div class="col-sm-6"><span id="vegetable-box-price"></span>&nbsp;SEK</div>
+      </div>
+    </fieldset>
+
+    <fieldset class="form-group" id="purchaser-details">
+      <legend>Your details</legend>
+      
+      <div class="form-group row">
+        <label for="name" class="col-sm-4 col-form-label">Name</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" form-validation-type="name" id="name" name="name" placeholder="Name">
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <label for="email" class="col-sm-4 col-form-label">E-mail</label>
+        <div class="col-sm-6">
+          <input type="email" class="form-control" form-validation-type="email" id="email" name="email" placeholder="E-mail">
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <label for="telephone" class="col-sm-4 col-form-label">Telephone Number</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" form-validation-type="phone" id="telephone" name="telephone" placeholder="Telephone Number">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="form-group" id="delivery-details">
+      <legend>Delivery</legend>
+
+      <div class="row">
+        <div class="col-sm-6 offset-md-4" id="delivery-type">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="collection" name="delivery-type" value="collection">
+            <label class="form-check-label" for="collection">Collection from Whisk</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="delivery" name="delivery-type" value="delivery" />
+            <label class="form-check-label" for="delivery">Delivery</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="split-delivery" name="delivery-type" value="split-delivery">
+            <label class="form-check-label" for="split-delivery">Delivery to another person / multiple people</label>
+          </div>
+          <button type="button" class="btn icon-button btn-sm" data-toggle="modal" data-target="#deliveryZoneModal"><img class="delivery-icon" src="/icons/zone-map.png" alt="Delivery Zones" /> Delivery Zones</button>
+        </div>
+      </div>
+      
+      <div id="user-delivery">
+        <div class="form-group row">
+          <label for="address" class="col-sm-4 col-form-label">Address</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" id="address" name="address" autocomplete="chrome-off" placeholder="Address">
+            <input type="hidden" id="zone" name="zone" value="3">
+            <input type="hidden" id="google-formatted-address" name="google-formatted-address" value="">
+            <div id="message-address"></div>
+          </div>
+        </div>
+        
+        <div class="form-group row">
+          <label for="notes-address" class="col-sm-4 col-form-label">Delivery Notes<br />(please include doorcode and floor)</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" id="notes-address" name="notes-address" placeholder="Delivery Notes">
+          </div>
+        </div>
+      </div>
+
+      <div id="split-delivery-buttons">
+        <div class="form-group row">
+          <div class="col-sm-6 offset-md-4">
+            <button type="button" class="btn btn-success item-button add-recipient" id="add-recipient" name="add-recipient">Add Recipient</button>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset id="submit-fieldset">
+      <legend>Summary</legend>
+
+      <div class="form-group row" id="rebate-code-div">
+        <label for="rebate-code" class="col-sm-4 col-form-label">Rebate Code</label>
+        <div class="col-sm-4">
+          <input type="text" class="form-control" id="rebate-code" name="rebate-code" placeholder="Rebate Code">
+          <div id="message-rebate-code"></div>
+        </div>
+        <div class="col-sm-2">
+          <button class="btn btn-primary" id="rebate-apply" type="button">Apply</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="col-sm-4">Food Cost:</label>
+        <div class="col-sm-2">
+          <span id="food-cost">0</span> SEK
+        </div>
+        <div class="col-sm-6">
+          (<span id="food-moms">0</span> SEK MOMs)
+        </div>
+      </div>
+
+      <div class="row">
+        <label class="col-sm-4">Delivery Cost:</label>
+        <div class="col-sm-2">
+          <span id="delivery-cost">0</span> SEK
+          </div>
+        <div class="col-sm-6">
+          (<span id="delivery-moms">0</span> SEK MOMs)
+        </div>
+      </div>
+
+      <div class="row total-to-pay-text">
+        <label class="col-sm-4">TOTAL TO PAY:</label>
+        <div class="col-sm-6">
+          <span id="total-cost">0</span> SEK
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-sm-6 offset-md-4">
+          <input type="hidden" id="numZone2Deliveries" name="numZone2Deliveries" value="0" />
+          <input type="hidden" id="recipients" name="recipients" value="0">
+          <input type="hidden" name="callback-url" value="<%=confirmationUrl %>">
+          <button class="btn btn-primary form-validate" type="submit" formaction="<%=formSubmitUrl %>">Check and Confirm</button>
+        </div>
+      </div>
+    </fieldset>
+
+  </form>
+<%-include('partials/footer', {
+  page
+}); %>

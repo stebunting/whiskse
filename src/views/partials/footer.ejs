@@ -46,12 +46,12 @@
 <!-- Whisk JS -->
 <script src="/js/instagram.js"></script><%
 
-if (page === 'treatboxes') { %>
+if (page === 'treatbox') { %>
 <script src="/js/date.format.js"></script>
 <script src="/js/form-verification.js"></script>
 <script src="/js/treatboxes.js" type="module"></script><%
 
-} else if (page === 'treatbox-confirm') { %>
+} else if (page === 'treatboxconfirm') { %>
 <script src="/js/treatbox-confirm.js"></script><%
 
 } else if (page === 'menu') { %>
@@ -59,8 +59,8 @@ if (page === 'treatboxes') { %>
 } %>
 
 <!-- Google Maps JS --><%
-if (page === 'treatboxes') { %>
-<script src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&libraries=places,geometry&callback=initMap"></script>
+if (page === 'treatbox') { %>
+<script src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&libraries=places,geometry"></script>
 <%
 
 } else { %>

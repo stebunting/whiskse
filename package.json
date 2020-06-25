@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/stebunting/whiskse#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "bootstrap": "^4.5.0",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",

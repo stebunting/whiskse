@@ -12,10 +12,13 @@ function routes() {
   const whiskRoutes = express.Router();
 
   whiskRoutes.route('/')
-    .get((req, res) => res.render('index', { googleApiKey }));
+    .get((req, res) => res.render('index', { googleApiKey, page: 'index' }));
 
   whiskRoutes.route('/menu')
-    .get((req, res) => res.render('menu', { googleApiKey }));
+    .get((req, res) => res.render('menu', { googleApiKey, page: 'menu' }));
+
+  whiskRoutes.route('/custom')
+    .get((req, res) => res.render('custom', { googleApiKey, page: 'custom' }));
 
   return whiskRoutes;
 }

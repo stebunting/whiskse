@@ -22,8 +22,8 @@
         <li><a id="instagram" href="https://www.instagram.com/whisk_stklm/" target="_blank" rel="external"></a></li>
         <li><a id="facebook" href="https://www.facebook.com/WhiskStockholm/" target="_blank" rel="external"></a></li>
       </ul>
-
     </div>
+    
     <div class="col-md-4 col-12 latest-instagram-holder">
       <div class="row latest-instagram" id="instagram-images-header">
         <h4>LATEST FROM INSTAGRAM</h4>
@@ -38,7 +38,6 @@
       </div>
     </div>
   </div>
-
 </div>
 
 <!-- JQuery -->
@@ -53,15 +52,14 @@
 <% } else if (page === 'treatbox-confirm') { %>
 <script src="/js/treatbox-confirm.js"></script>
 <% } %>
-
 <!-- Google Maps JS -->
 <script src="/js/googlemap.js"></script>
 <% if (page === 'treatboxes') { %>
 <script src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&libraries=places,geometry&callback=initMap"></script>
 <% } else { %><script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&callback=initMap"></script>
 <% } %>
-
 <!-- Bootstrap Required JS -->
 <script src="/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

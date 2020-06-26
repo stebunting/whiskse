@@ -67,12 +67,12 @@
       <div class="form-group row">
         <label class="col-sm-4" for="quantity-<%=product._id %>"><%=product.name %></label>
         <div class="col-sm-2 form-group">
-          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>"><%
+          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-deliverable="<%=product.deliverable %>"><%
             for (let i = 0; i < 10; i += 1) { %>
             <option value="<%=i %>"><%=i %></option><% } %>
           </select>
         </div>
-        <div class="col-sm-6"><span id="price-<%=product._id %>"><%=priceFormat(product.grossPrice) %></span>&nbsp;SEK</div>
+        <div class="col-sm-6"><%=priceFormat(product.grossPrice, true) %></div>
       </div><%
         } %>
     </fieldset>

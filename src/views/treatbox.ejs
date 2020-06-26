@@ -50,46 +50,31 @@
       <legend>When do you want to order for?</legend>
       <div class="form-group row">
         <div class="col-sm-10 offset-md-1 form-group">
-          <select class="form-control form-control-sm" id="date" name="date"></select>
+          <select class="form-control form-control-sm" id="date" name="date"><%
+            for (const [code, date] of Object.entries(apiResponse.timeframe)) { %>
+            <option value="<%=code %>"><%=dateFormat(date.delivery) %></option><%
+            } %>
+          </select>
           <input type="hidden" id="date-text" name="date-text" value="" />
         </div>
       </div>
     </fieldset>
 
     <fieldset class="form-group" id="product-selector">
-      <legend>What would you like to buy?</legend>
-      <div class="form-group row">
-        <label class="col-sm-4" for="num-comboboxes">Combo Boxes</label>
-        <div class="col-sm-2 form-group">
-          <select class="form-control form-control-sm" id="num-comboboxes" name="num-comboboxes"><%
-            for (let i = 0; i < 10; i += 1) { %>
-            <option value="<%=i %>"><%=i %></option><% } %>
-          </select>
-        </div>
-        <div class="col-sm-6"><span id="combo-box-price"></span>&nbsp;SEK</div>
-      </div>
+      <legend>What would you like to buy?</legend><%
 
+      for (const product of Object.values(apiResponse.products)) { %>
       <div class="form-group row">
-        <label class="col-sm-4" for="num-treatboxes">Treat Boxes</label>
+        <label class="col-sm-4" for="quantity-<%=product._id %>"><%=product.name %></label>
         <div class="col-sm-2 form-group">
-          <select class="form-control form-control-sm" id="num-treatboxes" name="num-treatboxes"><%
+          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>"><%
             for (let i = 0; i < 10; i += 1) { %>
             <option value="<%=i %>"><%=i %></option><% } %>
           </select>
         </div>
-        <div class="col-sm-6"><span id="treat-box-price"></span>&nbsp;SEK</div>
-      </div>
-
-      <div class="form-group row">
-        <label class="col-sm-4" for="num-vegetableboxes">Vegetable Boxes<br />[pick up only]</label>
-        <div class="col-sm-2 form-group">
-          <select class="form-control form-control-sm" id="num-vegetableboxes" name="num-vegetableboxes"><%
-            for (let i = 0; i < 10; i += 1) { %>
-            <option value="<%=i %>"><%=i %></option><% } %>
-          </select>
-        </div>
-        <div class="col-sm-6"><span id="vegetable-box-price"></span>&nbsp;SEK</div>
-      </div>
+        <div class="col-sm-6"><span id="price-<%=product._id %>"><%=priceFormat(product.grossPrice) %></span>&nbsp;SEK</div>
+      </div><%
+        } %>
     </fieldset>
 
     <fieldset class="form-group" id="purchaser-details">

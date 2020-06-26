@@ -10,9 +10,9 @@ import {
   inZoneTwo
 } from './boundaries.js';
 
-// Get Details
-const managementUrl = 'https://whisk-management.herokuapp.com/';
-const dataLoading = fetch(`${managementUrl}treatbox/orderdetails`);
+// // Get Details
+// const managementUrl = 'https://whisk-management.herokuapp.com/';
+// const dataLoading = fetch(`${managementUrl}treatbox/orderdetails`);
 
 // Settings
 let zone3delivery = false;

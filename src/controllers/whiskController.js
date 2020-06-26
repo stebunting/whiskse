@@ -2,28 +2,41 @@
 const tag = 'whiskse:whiskController';
 
 // Requirements
+const axios = require('axios');
 const debug = require('debug')(tag);
+const { priceFormat, dateFormat } = require('../functions/helper');
 
 // Constants
+const baseManagementUrl = 'https://whisk-management.herokuapp.com';
 const googleApiKey = process.env.GOOGLE_API_KEY;
 
 function whiskController() {
-  function treatboxOrderForm(req, res) {
+  async function treatboxOrderForm(req, res) {
     const confirmationUrl = new URL(`${req.protocol}://${req.get('host')}/treatboxconfirm`);
-    const formSubmitUrl = new URL('https://whisk-management.herokuapp.com/treatbox/confirmation');
+    const formSubmitUrl = new URL(`${baseManagementUrl}/treatbox/confirmation`);
+    let apiResponse = {};
+    try {
+      const response = await axios.get(`${baseManagementUrl}/treatbox/orderdetails`);
+      apiResponse = response.data;
+    } catch (error) {
+      debug(error);
+    }
 
     return res.render('treatbox', {
       googleApiKey,
       page: 'treatbox',
       confirmationUrl,
-      formSubmitUrl
+      formSubmitUrl,
+      apiResponse,
+      priceFormat,
+      dateFormat
     });
   }
 
   function treatboxConfirmation(req, res) {
     const amendUrl = new URL(`${req.protocol}://${req.get('host')}/treatbox`);
     const orderPlacedUrl = new URL(`${req.protocol}://${req.get('host')}/orderplaced`);
-    const formSubmitUrl = new URL('https://whisk-management.herokuapp.com/treatbox/invoicepayment');
+    const formSubmitUrl = new URL(`${baseManagementUrl}/treatbox/invoicepayment`);
 
     return res.render('treatboxconfirm', {
       googleApiKey,

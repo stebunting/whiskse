@@ -10,7 +10,7 @@ import {
 initialise();
 
 // Constants
-const managementBaseUrl = 'http://127.0.0.1:5000'
+const managementBaseUrl = 'http://127.0.0.1:5000';
 const animationTime = 400;
 
 // User Choices
@@ -73,6 +73,60 @@ function getDetailsFromId(htmlId) {
   return { field, id };
 }
 
+function priceFormat(num, includeSymbol = true) {
+  let str = (num / 100).toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  });
+  str = str.replace(',', '');
+  str += includeSymbol ? ' SEK' : '';
+  return str;
+}
+
+// Update Price
+function updatePrice() {
+  let basket = [];
+  $('select[id^=quantity-]').each(function callback() {
+    const quantity = parseInt($(this).val(), 10);
+    if (quantity > 0) {
+      const item = {
+        id: getDetailsFromId($(this).attr('id')).id,
+        quantity
+      };
+      basket.push(item);
+    }
+  });
+  basket = JSON.stringify(basket);
+
+  let zone2Deliveries = 0;
+  if (!$('#collection').is(':checked')) {
+    $('input[id^=zone]').each(function callback() {
+      if ($(this).val() === '2') {
+        zone2Deliveries += 1;
+      }
+    });
+  }
+  const delivery = JSON.stringify({ zone2: zone2Deliveries });
+
+  $.ajax({
+    method: 'post',
+    url: `${managementBaseUrl}/treatbox/lookupprice`,
+    data: {
+      basket,
+      delivery
+    }
+  }).then((data) => {
+    if (data.status === 'OK') {
+      $('#food-cost').text(priceFormat(data.bottomLine.foodCost));
+      $('#food-moms').text(priceFormat(data.bottomLine.foodMoms));
+      $('#delivery-cost').text(priceFormat(data.bottomLine.deliveryCost));
+      $('#delivery-moms').text(priceFormat(data.bottomLine.deliveryMoms));
+      $('#total-cost').text(priceFormat(data.bottomLine.total));
+      $('.zone2-surcharge-amount').text(priceFormat(data.delivery.zone2Price))
+    }
+  });
+}
+
 // Validate address and generate message
 function validateGoogleAddress(recipientId) {
   const namePostfix = getNamePostfix(recipientId);
@@ -96,9 +150,9 @@ function validateGoogleAddress(recipientId) {
   } else if (zone === 1) {
     message = 'Zone 1';
   } else if (zone === 2) {
-    message = 'Zone 2 // Some Surcharge';
+    message = 'Zone 2 // <span class="zone2-surcharge-amount"></span> Surcharge';
   } else if (zone3delivery) {
-    message = 'Zone 3 // Some Surcharge';
+    message = 'Zone 3 // <span class="zone2-surcharge-amount"></span> Surcharge';
   } else {
     message = 'Outside Delivery Area';
     valid = false;
@@ -106,7 +160,7 @@ function validateGoogleAddress(recipientId) {
 
   printMessage(selector, valid);
 
-  $(`#message-address${namePostfix}`).text(message);
+  $(`#message-address${namePostfix}`).html(message);
 }
 
 // Set up Google Autocomplete
@@ -133,36 +187,12 @@ function setUpAddressDropdown(recipientId) {
     $(`#address${namePostfix}`).val(googleLocation.formatted_address);
     $(`#google-formatted-address${namePostfix}`).val(googleLocation.formatted_address);
     $(`#zone${namePostfix}`).val(getZone(googleLocation.geometry.location));
+    updatePrice();
     validateGoogleAddress(recipientId);
   });
 
   // Enter key should select Autocomplete item when list is open
   $(`#address${namePostfix}`).keydown((e) => !(e.which === 13 && $('.pac-container:visible').length));
-}
-
-// Update Price
-function updatePrice() {
-  let basket = [];
-  $('select[id^=quantity-]').each(function callback() {
-    const quantity = parseInt($(this).val(), 10);
-    if (quantity > 0) {
-      const item = {
-        id: getDetailsFromId($(this).attr('id')).id,
-        quantity
-      };
-      basket.push(item);
-    }
-  });
-  basket = JSON.stringify(basket);
-  $.ajax({
-    method: 'post',
-    url: `${managementBaseUrl}/treatbox/lookupprice`,
-    data: {
-      basket
-    }
-  }).then((data) => {
-    console.log(data);
-  })
 }
 
 // On DOM Loaded...
@@ -183,10 +213,12 @@ $(() => {
   $('#delivery').click(() => {
     $('#user-delivery').show(animationTime);
     $('#address, #notes-address').prop('disabled', false);
+    updatePrice();
   });
 
   $('#collection').click(() => {
     $('#user-delivery').hide(animationTime);
+    updatePrice();
   });
 
   // Address

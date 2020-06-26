@@ -1,22 +1,25 @@
-// Get Product Details
-const managementUrl = 'https://whisk-management.herokuapp.com/';
-const animationTime = 400;
+/* global google, validateInput, printMessage */
+// Requirements
+import {
+  initialise,
+  isLocal,
+  inZoneOne,
+  inZoneTwo
+} from './boundaries.js';
+
+initialise();
 
 // Constants
-const dataLoading = fetch(`${managementUrl}treatbox/orderdetails`);
-// const dateFormatString = 'dddd dS mmmm';
+const animationTime = 400;
 
 // User Choices
 let deliverable = false;
-
-// User Choices
-// let itemsSelected = 0;
+let zone3delivery = false;
 
 // Show Purchaser/Delivery Details if hidden
 function showPurchaserDetails() {
   if (!$('#purchaser-details').is(':visible')) {
-    $('#purchaser-details').show(animationTime);
-    $('#delivery-details').show(animationTime);
+    $('#purchaser-details, #delivery-details').show(animationTime);
   }
 }
 
@@ -29,57 +32,136 @@ function setDelivery() {
     }
   });
   if (deliverable) {
-    let selectDelivery = false;
-    if ($('#delivery').prop('disabled')) {
-      selectDelivery = true;
-    }
+    const deliveryWasDisabled = $('#delivery').prop('disabled');
     $('#delivery').prop('disabled', false);
-    $('#split-delivery').prop('disabled', false);
-    if (selectDelivery) {
+    // $('#split-delivery').prop('disabled', false);
+    if (deliveryWasDisabled) {
       $('#delivery').trigger('click');
     }
   } else {
     $('#delivery').prop('disabled', true);
-    $('#split-delivery').prop('disabled', true);
+    // $('#split-delivery').prop('disabled', true);
     $('#collection').trigger('click');
   }
 }
 
+// Get address zone
+function getZone(location) {
+  if (isLocal(location)) {
+    return 0;
+  }
+  if (inZoneOne(location)) {
+    return 1;
+  }
+  if (inZoneTwo(location)) {
+    return 2;
+  }
+  return 3;
+}
+
+function getNamePostfix(id) {
+  let namePostfix = '';
+  if (id != null) {
+    namePostfix = `-${id}`;
+  }
+  return namePostfix;
+}
+
+// Validate address and generate message
+function validateGoogleAddress(recipientId) {
+  const namePostfix = getNamePostfix(recipientId);
+
+  const selector = $(`#address${namePostfix}`);
+  const addressToValidate = $(`#address${namePostfix}`).val();
+  const googleAddress = $(`#google-formatted-address${namePostfix}`).val();
+  const zone = parseInt($(`#zone${namePostfix}`).val(), 10);
+
+  let valid = true;
+  let message;
+
+  if (addressToValidate === '') {
+    valid = null;
+    message = '';
+  } else if (googleAddress !== addressToValidate || Number.isNaN(zone)) {
+    message = 'Invalid Address, please select from dropdown menu';
+    valid = false;
+  } else if (zone === 0) {
+    message = 'Local';
+  } else if (zone === 1) {
+    message = 'Zone 1';
+  } else if (zone === 2) {
+    message = 'Zone 2 // Some Surcharge';
+  } else if (zone3delivery) {
+    message = 'Zone 3 // Some Surcharge';
+  } else {
+    message = 'Outside Delivery Area';
+    valid = false;
+  }
+
+  printMessage(selector, valid);
+
+  $(`#message-address${namePostfix}`).text(message);
+}
+
+// Set up Google Autocomplete
+function setUpAddressDropdown(recipientId) {
+  const namePostfix = getNamePostfix(recipientId);
+
+  // Set up autocomplete
+  const input = document.getElementById(`address${namePostfix}`);
+  const options = {
+    types: ['address'],
+    componentRestrictions: { country: ['se'] },
+    bounds: new google.maps.LatLngBounds(
+      new google.maps.LatLng(59.276402, 17.829733),
+      new google.maps.LatLng(59.410845, 18.257856)
+    )
+  };
+  const autocomplete = new google.maps.places.Autocomplete(input, options);
+
+  // On item selected
+  google.maps.event.addListener(autocomplete, 'place_changed', () => {
+    const googleLocation = autocomplete.getPlace();
+
+    // Set and Validate Delivery Address
+    $(`#address${namePostfix}`).val(googleLocation.formatted_address);
+    $(`#google-formatted-address${namePostfix}`).val(googleLocation.formatted_address);
+    $(`#zone${namePostfix}`).val(getZone(googleLocation.geometry.location));
+    validateGoogleAddress(recipientId);
+  });
+
+  // Enter key should select Autocomplete item when list is open
+  $(`#address${namePostfix}`).keydown((e) => !(e.which === 13 && $('.pac-container:visible').length));
+}
+
+// On DOM Loaded...
 $(() => {
   // Select Items
   $('select[id^=quantity-]').change(() => {
     setDelivery();
     showPurchaserDetails();
-
-    // const previousTotalDeliverable = products.totalDeliverableItems();
-    // const previousTotal = products.totalItems();
-
-    // // Remove removed items from recipients
-    // const removedItems = products.update($(this));
-    // for (let i = 0; i < removedItems.length; i += 1) {
-    //   if (removedItems[i].recipientId != null) {
-    //     const recipient = recipients.list[removedItems[i].recipientId];
-    //     for (let j = 0; j < recipient.itemsToDeliver.length; j += 1) {
-    //       if (recipient.itemsToDeliver[j].id === removedItems[i].id) {
-    //         recipient.itemsToDeliver[j].pop();
-    //       }
-    //     }
-    //   }
-    // }
   });
 
-  // When Product Details Loaded
-  // dataLoading
-  //   .then((response) => response.json())
-  //   .then((data) => {
-  //     if (data.status === 'OK') {
-  //       console.log(data);
-  //     }
-  //   });
+  // Validate User Details as they are entered
+  $('#name, #email, #telephone').focusout(function callback() {
+    validateInput($(this));
+  });
+
+  // Delivery Type
+  $('#delivery').click(() => {
+    $('#user-delivery').show(animationTime);
+    $('#address, #notes-address').prop('disabled', false);
+  });
+
+  $('#collection').click(() => {
+    $('#user-delivery').hide(animationTime);
+  });
+
+  // Address
+  setUpAddressDropdown();
+  $('#address').focusout(() => validateGoogleAddress());
 
   // Hide Loading Spinner and Show Page
   $('#loading-div').hide(animationTime);
-  $('#date-selector').show(animationTime);
-  $('#product-selector').show(animationTime);
-  $('#submit-fieldset').show(animationTime);
+  $('#date-selector, #product-selector, #submit-fieldset').show(animationTime);
 });

@@ -10,6 +10,7 @@ import {
 initialise();
 
 // Constants
+const managementBaseUrl = 'http://127.0.0.1:5000'
 const animationTime = 400;
 
 // User Choices
@@ -65,6 +66,11 @@ function getNamePostfix(id) {
     namePostfix = `-${id}`;
   }
   return namePostfix;
+}
+
+function getDetailsFromId(htmlId) {
+  const [field, id] = htmlId.split('-');
+  return { field, id };
 }
 
 // Validate address and generate message
@@ -134,12 +140,38 @@ function setUpAddressDropdown(recipientId) {
   $(`#address${namePostfix}`).keydown((e) => !(e.which === 13 && $('.pac-container:visible').length));
 }
 
+// Update Price
+function updatePrice() {
+  let basket = [];
+  $('select[id^=quantity-]').each(function callback() {
+    const quantity = parseInt($(this).val(), 10);
+    if (quantity > 0) {
+      const item = {
+        id: getDetailsFromId($(this).attr('id')).id,
+        quantity
+      };
+      basket.push(item);
+    }
+  });
+  basket = JSON.stringify(basket);
+  $.ajax({
+    method: 'post',
+    url: `${managementBaseUrl}/treatbox/lookupprice`,
+    data: {
+      basket
+    }
+  }).then((data) => {
+    console.log(data);
+  })
+}
+
 // On DOM Loaded...
 $(() => {
   // Select Items
   $('select[id^=quantity-]').change(() => {
     setDelivery();
     showPurchaserDetails();
+    updatePrice();
   });
 
   // Validate User Details as they are entered

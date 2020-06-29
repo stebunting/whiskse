@@ -228,4 +228,10 @@ $(() => {
   // Hide Loading Spinner and Show Page
   $('#loading-div').hide(animationTime);
   $('#date-selector, #product-selector, #submit-fieldset').show(animationTime);
+
+  // Check if form is posted
+  if (post) {
+    $('select[id^=quantity-]:first').trigger('change');
+    $(`input[name=delivery-type][value=${deliveryType}`).click();
+  }
 });

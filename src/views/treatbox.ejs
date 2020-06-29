@@ -4,7 +4,12 @@
   headerDisplay: false
 }); %>
   <script>
-    var postData = []; // <?php print(json_encode($_POST)); ?>;
+    const post = <%
+    if (Object.keys(body).length > 0) {
+      %>true;
+    const deliveryType = '<%=body['delivery-type'] %>';<%
+    } else { %>false;<%
+    } %>
   </script>
 
   <h2 class="treatbox-form-header">Your Weekly Wednesday Delivery of Sweet Treats and Lilla Laback Organic Vegetables</h2>
@@ -69,7 +74,9 @@
         <div class="col-sm-2 form-group">
           <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-deliverable="<%=product.deliverable %>"><%
             for (let i = 0; i < 10; i += 1) { %>
-            <option value="<%=i %>"><%=i %></option><% } %>
+            <option value="<%=i %>"<% 
+              if (body[`quantity-${product._id}`] && parseInt(body[`quantity-${product._id}`], 10) === i) { %> selected<% }
+            %>><%=i %></option><% } %>
           </select>
         </div>
         <div class="col-sm-6"><%=priceFormat(product.grossPrice, true) %></div>
@@ -83,21 +90,21 @@
       <div class="form-group row">
         <label for="name" class="col-sm-4 col-form-label">Name</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" form-validation-type="name" id="name" name="name" placeholder="Name">
+          <input type="text" class="form-control" form-validation-type="name" id="name" name="name" placeholder="Name" value="<% if (body.name) { %><%=body.name %><% } %>">
         </div>
       </div>
       
       <div class="form-group row">
         <label for="email" class="col-sm-4 col-form-label">E-mail</label>
         <div class="col-sm-6">
-          <input type="email" class="form-control" form-validation-type="email" id="email" name="email" placeholder="E-mail">
+          <input type="email" class="form-control" form-validation-type="email" id="email" name="email" placeholder="E-mail" value="<% if (body.email) { %><%=body.email %><% } %>">
         </div>
       </div>
       
       <div class="form-group row">
         <label for="telephone" class="col-sm-4 col-form-label">Telephone Number</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" form-validation-type="phone" id="telephone" name="telephone" placeholder="Telephone Number">
+          <input type="text" class="form-control" form-validation-type="phone" id="telephone" name="telephone" placeholder="Telephone Number" value="<% if (body.telephone) { %><%=body.telephone %><% } %>">
         </div>
       </div>
     </fieldset>
@@ -127,9 +134,9 @@
         <div class="form-group row">
           <label for="address" class="col-sm-4 col-form-label">Address</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" id="address" name="address" autocomplete="chrome-off" placeholder="Address">
-            <input type="hidden" id="zone" name="zone" value="3">
-            <input type="hidden" id="google-formatted-address" name="google-formatted-address" value="">
+            <input type="text" class="form-control" id="address" name="address" autocomplete="chrome-off" placeholder="Address" value="<% if (body.address) { %><%=body.address %><% } %>">
+            <input type="hidden" id="zone" name="zone" value="<% if (body.zone) { %><%=body.zone %><% } else { %>3<% } %>">
+            <input type="hidden" id="google-formatted-address" name="google-formatted-address" value="<% if (body['google-formatted-address']) { %><%=body['google-formatted-address'] %><% } %>">
             <div id="message-address"></div>
           </div>
         </div>
@@ -137,7 +144,7 @@
         <div class="form-group row">
           <label for="notes-address" class="col-sm-4 col-form-label">Delivery Notes<br />(please include doorcode and floor)</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" id="notes-address" name="notes-address" placeholder="Delivery Notes">
+            <input type="text" class="form-control" id="notes-address" name="notes-address" placeholder="Delivery Notes" value="<% if (body['notes-address']) { %><%=body['notes-address'] %><% } %>">
           </div>
         </div>
       </div>

@@ -4,7 +4,7 @@ const tag = 'whiskse:whiskController';
 // Requirements
 const axios = require('axios');
 const debug = require('debug')(tag);
-const { priceFormat, dateFormat } = require('../functions/helper');
+const { priceFormat, dateFormat, parseDateCode } = require('../functions/helper');
 
 // Constants
 const baseManagementUrl = 'https://whisk-management.herokuapp.com';
@@ -27,6 +27,7 @@ function whiskController() {
       page: 'treatbox',
       confirmationUrl,
       formSubmitUrl,
+      body: req.body,
       apiResponse,
       priceFormat,
       dateFormat
@@ -45,7 +46,9 @@ function whiskController() {
       orderPlacedUrl,
       formSubmitUrl,
       body: req.body,
-      params: req.params
+      params: req.params,
+      dateFormat,
+      parseDateCode
     });
   }
 

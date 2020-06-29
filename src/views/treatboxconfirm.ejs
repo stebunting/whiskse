@@ -130,7 +130,7 @@ switch (body['delivery-type']) {
   <table class="table table-striped table-bordered table-hover">
     <tr>
       <th class="table-label" scope="row">Date</th>
-      <td><%=body['date-text'] %></td>
+      <td><%=dateFormat(parseDateCode(body.date)) %></td>
     </tr>
     <tr>
       <th class="table-label" scope="row">Delivery</th>

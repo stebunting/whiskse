@@ -17,7 +17,8 @@ function routes() {
     .get((req, res) => res.render('index', { googleApiKey, page: 'index' }));
 
   whiskRoutes.route('/treatbox')
-    .get(treatboxOrderForm);
+    .get(treatboxOrderForm)
+    .post(treatboxOrderForm);
 
   whiskRoutes.route('/treatboxconfirm')
     .get((req, res) => res.redirect('/treatbox'))

@@ -20,6 +20,14 @@ function dateFormat(date) {
     .format(preferredFormat);
 }
 
+function parseDateCode(dateCode) {
+  let [year, week, weekday] = dateCode.split('-');
+  if (weekday === undefined) {
+    weekday = '3';
+  }
+  return moment().year(year).week(week).weekday(weekday);
+}
+
 // // Function to calculate MOMs amount from a final sale price (rounded to nearest krona)
 // function calculateMoms(gross, momsRate) {
 //   const decimalRate = 1 + (momsRate / 100);
@@ -110,6 +118,7 @@ function dateFormat(date) {
 module.exports = {
   priceFormat,
   dateFormat,
+  parseDateCode
   // calculateMoms,
   // calculateNetCost,
   // getGoogleMapsUrl,

@@ -1,5 +1,0 @@
----
-deployment:
-  tasks:
-    - e export DEPLOYPATH=/home/whiskse/app
-    - /bin/cp -R * $DEPLOYPATH

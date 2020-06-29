@@ -28,6 +28,6 @@ const whiskRouter = require('./src/routes/whiskRoutes')();
 app.use('/', whiskRouter);
 
 // Start Server
-app.listen(port, () => {
+const listener = app.listen(port, () => {
   debug(`Express server listening on port ${port}...`);
 });

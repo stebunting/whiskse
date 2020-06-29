@@ -1,0 +1,11 @@
+<%-include('partials/header', {
+  page,
+  title: 'Whisk',
+  headerDisplay: true,
+  header: 'Order Placed'
+}); %>
+	<p>Thanks for the order<%
+	if (query.name) { %> <%=query.name %><% } %>!</p>
+<%-include('partials/footer', {
+  page
+}); %>

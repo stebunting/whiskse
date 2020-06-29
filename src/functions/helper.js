@@ -25,7 +25,11 @@ function parseDateCode(dateCode) {
   if (weekday === undefined) {
     weekday = '3';
   }
-  return moment().year(year).week(week).weekday(weekday);
+  return moment()
+    .tz('Europe/Stockholm')
+    .year(year)
+    .week(week)
+    .weekday(weekday);
 }
 
 // // Function to calculate MOMs amount from a final sale price (rounded to nearest krona)

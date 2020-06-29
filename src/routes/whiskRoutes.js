@@ -24,6 +24,13 @@ function routes() {
     .get((req, res) => res.redirect('/treatbox'))
     .post(treatboxConfirmation);
 
+  whiskRoutes.route('/orderplaced')
+    .get((req, res) => res.render('orderplaced', {
+      googleApiKey,
+      page: 'menu',
+      query: req.query
+    }));
+
   whiskRoutes.route('/menu')
     .get((req, res) => res.render('menu', { googleApiKey, page: 'menu' }));
 

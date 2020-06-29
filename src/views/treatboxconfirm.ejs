@@ -8,8 +8,8 @@
 body['callback-url'] = orderPlacedUrl;
 
 errorMessages = [];
-if (params.status) {
-  const messages = params.status.split(',');
+if (query.status) {
+  const messages = query.status.split(',');
 
   messages.forEach((message) => {
     switch (message) {
@@ -102,7 +102,6 @@ switch (body['delivery-type']) {
     break;
 } %>
 
-<script>const numZone2Deliveries = <%=body['numZone2Deliveries'] %>;</script>
   <p>Please check your order before comfirming below.</p>
 
   <ul class="error-message"><%
@@ -196,45 +195,30 @@ switch (body['delivery-type']) {
       <th class="order-price column">Price</th>
       <th class="order-subtotal column">Sub-Total</th>
     </tr>
-    <% if (body['num-comboboxes'] > 0) { %>
+    <% for (let i = 0; i < priceInformation.products.length; i += 1) {
+        const product = priceInformation.products[i]; %>
     <tr>
-      <td class="order-item">Combo Boxes</td>
-      <td id="combobox-quantity" class="order-quantity"><%=body['num-comboboxes'] %></td>
-      <td id="combobox-price" class="order-price"></td>
-      <td id="combobox-subtotal" class="order-subtotal"></td>
-    </tr>
-    <% }
-    if (body['num-treatboxes'] > 0) { %>
-    <tr>
-      <td class="order-item">Treat Boxes</td>
-      <td id="treatbox-quantity" class="order-quantity"><%=body['num-treatboxes'] %></td>
-      <td id="treatbox-price" class="order-price"></td>
-      <td id="treatbox-subtotal" class="order-subtotal"></td>
-    </tr>
-    <% }
-    if (body['num-vegetableboxes'] > 0) { %>
-    <tr>
-      <td class="order-item">Vegetable Boxes</td>
-      <td id="vegetablebox-quantity" class="order-quantity"><%=body['num-vegetableboxes'] %></td>
-      <td id="vegetablebox-price" class="order-price"></td>
-      <td id="vegetablebox-subtotal" class="order-subtotal"></td>
+      <td class="order-item"><%=product.name %></td>
+      <td id="combobox-quantity" class="order-quantity"><%=product.quantity %></td>
+      <td id="combobox-price" class="order-price"><%=priceFormat(product.price) %></td>
+      <td id="combobox-subtotal" class="order-subtotal"><%=priceFormat(product.subTotal) %></td>
     </tr>
     <% } %>
     <tr>
       <th class="order-total" colspan="3" scope="row">Food Cost</th>
-      <td id="food-total" class="order-subtotal"></td>
+      <td id="food-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.foodCost) %></td>
     </tr>
     <tr>
       <th class="order-total" colspan="3" scope="row">Delivery Cost</th>
-      <td id="delivery-total" class="order-subtotal"></td>
+      <td id="delivery-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.deliveryCost) %></td>
     </tr>
     <tr>
       <th class="order-total" colspan="3" scope="row">MOMs</th>
-      <td id="moms-total" class="order-subtotal"></td>
+      <td id="moms-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.totalMoms) %></td>
     </tr>
     <tr>
       <th class="order-total" colspan="3" scope="row">Total Cost</th>
-      <th id="total-to-pay" class="order-subtotal" scope="row"></th>
+      <th id="total-to-pay" class="order-subtotal" scope="row"><%=priceFormat(priceInformation.bottomLine.total) %></th>
     </tr>
   </table>
 
@@ -274,11 +258,7 @@ switch (body['delivery-type']) {
         %><input type="hidden" name="<%=name %>" value="<%=value %>" /><%
       }
     }
-    %><input type="hidden" name="food-cost" value="" />
-    <input type="hidden" name="delivery-cost" value="" />
-    <input type="hidden" name="food-moms" value="" />
-    <input type="hidden" name="delivery-moms" value="" />
-    <input type="hidden" name="total-cost" value="" />
+    %>
 
     <button class="btn btn-primary" type="submit" formaction="<%=amendUrl %>" value="amend">Amend</button>
     <button class="btn btn-success" type="submit" id="submitorder" value="submit">Order and Pay</button>

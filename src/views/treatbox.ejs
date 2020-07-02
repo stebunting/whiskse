@@ -60,7 +60,6 @@
             <option value="<%=code %>"><%=dateFormat(date.delivery) %></option><%
             } %>
           </select>
-          <input type="hidden" id="date-text" name="date-text" value="" />
         </div>
       </div>
     </fieldset>
@@ -78,6 +77,7 @@
               if (body[`quantity-${product._id}`] && parseInt(body[`quantity-${product._id}`], 10) === i) { %> selected<% }
             %>><%=i %></option><% } %>
           </select>
+          <input type="hidden" id="<%=product._id %>" value="<%=product.name %>" />
         </div>
         <div class="col-sm-6"><%=priceFormat(product.grossPrice) %></div>
       </div><%

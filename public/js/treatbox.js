@@ -1,4 +1,4 @@
-/* global google, validateInput, printMessage */
+/* global google, validateInput, printMessage, post, deliveryType */
 // Requirements
 import {
   initialise,
@@ -11,12 +11,15 @@ initialise();
 
 // Constants
 const managementBaseUrl = 'http://127.0.0.1:5000';
-//const managementBaseUrl = 'https://whisk-management.herokuapp.com';
+// const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const animationTime = 400;
 
 // User Choices
 let deliverable = false;
 let zone3delivery = false;
+let basket = [];
+let items = [];
+const recipients = [];
 
 // Show Purchaser/Delivery Details if hidden
 function showPurchaserDetails() {
@@ -36,13 +39,13 @@ function setDelivery() {
   if (deliverable) {
     const deliveryWasDisabled = $('#delivery').prop('disabled');
     $('#delivery').prop('disabled', false);
-    // $('#split-delivery').prop('disabled', false);
+    $('#split-delivery').prop('disabled', false);
     if (deliveryWasDisabled) {
       $('#delivery').trigger('click');
     }
   } else {
     $('#delivery').prop('disabled', true);
-    // $('#split-delivery').prop('disabled', true);
+    $('#split-delivery').prop('disabled', true);
     $('#collection').trigger('click');
   }
 }
@@ -78,7 +81,7 @@ function priceFormat(num, userOptions = {}) {
   const options = {
     includeSymbol: userOptions.includeSymbol || true,
     includeOre: userOptions.includeOre || false
-  }
+  };
   let str = (num / 100).toLocaleString(undefined, {
     minimumFractionDigits: options.includeOre ? 2 : 0,
     maximumFractionDigits: options.includeOre ? 2 : 0
@@ -88,20 +91,45 @@ function priceFormat(num, userOptions = {}) {
   return str;
 }
 
+function updateItems() {
+  const oldItems = items.filter((x) => x.recipient !== null);
+  items = [];
+  $('select[id^=quantity-]').each(function callback() {
+    const quantity = parseInt($(this).val(), 10);
+    for (let i = 0; i < quantity; i += 1) {
+      const { id } = getDetailsFromId($(this).attr('id'));
+
+      const recipientIndex = oldItems.findIndex((x) => x.id === id);
+      let recipient = null;
+      if (recipientIndex > -1) {
+        recipient = oldItems[recipientIndex].recipient;
+        oldItems.splice(recipientIndex, 1);
+      }
+
+      items.push({
+        id,
+        name: $(`#${id}`).val(),
+        recipient
+      });
+    }
+  });
+}
+
 // Update Price
 function updatePrice() {
-  let basket = [];
+  basket = [];
   $('select[id^=quantity-]').each(function callback() {
     const quantity = parseInt($(this).val(), 10);
     if (quantity > 0) {
+      const { id } = getDetailsFromId($(this).attr('id'));
       const item = {
-        id: getDetailsFromId($(this).attr('id')).id,
+        id,
+        name: $(`#${id}`).val(),
         quantity
       };
       basket.push(item);
     }
   });
-  basket = JSON.stringify(basket);
 
   let zone2Deliveries = 0;
   if (!$('#collection').is(':checked')) {
@@ -117,7 +145,7 @@ function updatePrice() {
     method: 'post',
     url: `${managementBaseUrl}/treatbox/lookupprice`,
     data: {
-      basket,
+      basket: JSON.stringify(basket),
       delivery
     }
   }).then((data) => {
@@ -127,7 +155,7 @@ function updatePrice() {
       $('#delivery-cost').text(priceFormat(data.bottomLine.deliveryCost));
       $('#delivery-moms').text(priceFormat(data.bottomLine.deliveryMoms, { includeOre: true }));
       $('#total-cost').text(priceFormat(data.bottomLine.total));
-      $('.zone2-surcharge-amount').text(priceFormat(data.delivery.zone2Price))
+      $('.zone2-surcharge-amount').text(priceFormat(data.delivery.zone2Price));
     }
   });
 }
@@ -200,10 +228,170 @@ function setUpAddressDropdown(recipientId) {
   $(`#address${namePostfix}`).keydown((e) => !(e.which === 13 && $('.pac-container:visible').length));
 }
 
+function updateTextAreas() {
+  recipients.forEach((recipient) => {
+    const recipientsItems = items
+      .filter((x) => x.recipient === recipient.id)
+      .map((x) => x.name)
+      .sort();
+    const counts = {};
+    recipientsItems.forEach((item) => {
+      counts[item] = (counts[item] || 0) + 1;
+    });
+    const listItems = Object.entries(counts).map((x) => `${x[1]} x ${x[0]}`);
+    $(`#items-to-deliver-${recipient.id}`).val(listItems.join(', '));
+  });
+}
+
+function setAddRemoveRecipientStatus() {
+  const unassignedItems = items.filter((x) => x.recipient === null).length;
+  let assigned = recipients.length;
+  for (let i = 0; i < recipients.length; i += 1) {
+    if (items.filter((x) => x.recipient === recipients[i].id).length > 0) {
+      assigned -= 1;
+    }
+  }
+  if (unassignedItems - assigned > 0) {
+    $('.add-recipient').prop('disabled', false);
+  } else {
+    $('.add-recipient').prop('disabled', true);
+  }
+}
+
+function updateButtonRow() {
+  recipients.forEach((recipient) => {
+    let buttons = '';
+    items.forEach((item, index) => {
+      const selector = `${recipient.id}-item-${item.id}-${index}`;
+      let buttonType = 'btn-info';
+      let cross = '';
+      let disabled = '';
+      if (item.recipient !== null) {
+        cross = '&times; ';
+        buttonType = 'btn-secondary';
+        if (item.recipient !== recipient.id) {
+          disabled = ' disabled="true"';
+        }
+      }
+      buttons += `<button type="button" class="btn ${buttonType} item-button btn-sm" id="${selector}" name="${selector}"${disabled}>${cross}${item.name}</button>`;
+    });
+    $(`#button-row-${recipient.id}`).html(buttons);
+    items.forEach((item, index) => {
+      const selector = `${recipient.id}-item-${item.id}-${index}`;
+      $(`#${selector}`).click(() => {
+        if (item.recipient !== null) {
+          item.recipient = null;
+        } else {
+          item.recipient = recipient.id;
+        }
+        updateButtonRow();
+        updateTextAreas();
+        setAddRemoveRecipientStatus();
+      });
+    });
+  });
+}
+
+function addNewRecipient() {
+  const newRecipient = { id: recipients.length };
+  recipients.push(newRecipient);
+
+  const legendHeader = `Recipient ${newRecipient.id + 1}`;
+  const html = `
+      <fieldset class="form-group" id="recipient-${newRecipient.id}">
+      <legend class="recipient-legend-name-${newRecipient.id}">${legendHeader}</legend>
+
+      <div class="form-group row">
+        <label for="buttons" class="col-md-4 col-form-label">Select items to deliver</label>
+        <div class="col-md-8 button-row" id="button-row-${newRecipient.id}"></div>
+      </div>
+    
+      <div class="form-group row">
+        <label for="items-to-deliver" class="col-md-4 col-form-label"><span class="recipient-legend-name-${newRecipient.id}">${legendHeader}</span> will receive</label>
+        <div class="col-md-6">
+          <textarea class="form-control" form-validation-type="notes" height="5" id="items-to-deliver-${newRecipient.id}" name="items-to-deliver-${newRecipient.id}" readonly="true">Select items from above</textarea>
+          <input type="hidden" name="recipient-num-comboboxes-${newRecipient.id}" id="recipient-num-comboboxes-${newRecipient.id}" value="0" />
+          <input type="hidden" name="recipient-num-treatboxes-${newRecipient.id}" id="recipient-num-treatboxes-${newRecipient.id}" value="0" />
+          <input type="hidden" name="recipient-num-vegetableboxes-${newRecipient.id}" id="recipient-num-vegetableboxes-${newRecipient.id}" value="0" />
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="name-${newRecipient.id}" class="col-md-4 col-form-label">Name</label>
+        <div class="col-md-6">
+          <input type="text" class="form-control" form-validation-type="name" id="name-${newRecipient.id}" name="name-${newRecipient.id}" placeholder="Name">
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <label for="telephone-${newRecipient.id}" class="col-md-4 col-form-label">Telephone Number</label>
+        <div class="col-md-6">
+          <input type="telephone" class="form-control" form-validation-type="phone" id="telephone-${newRecipient.id}" name="telephone-${newRecipient.id}" placeholder="Telephone Number">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="address-${newRecipient.id}" class="col-md-4 col-form-label">Address</label>
+        <div class="col-md-6">
+          <input type="text" class="form-control" id="address-${newRecipient.id}" name="address-${newRecipient.id}" autocomplete="off" placeholder="Address">
+          <input type="hidden" id="zone-${newRecipient.id}" name="zone-${newRecipient.id}">
+          <input type="hidden" id="google-formatted-address-${newRecipient.id}" name="google-formatted-address-${newRecipient.id}">
+          <div id="message-address-${newRecipient.id}"></div>
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <label for="notes-address-${newRecipient.id}" class="col-md-4 col-form-label">Delivery Notes<br />(please include doorcode and floor)</label>
+        <div class="col-md-6">
+          <input type="text" class="form-control" id="notes-address-${newRecipient.id}" name="notes-address-${newRecipient.id}" placeholder="Delivery Notes">
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <label for="message-${newRecipient.id}" class="col-md-4 col-form-label">Optional Message</label>
+        <div class="col-md-6">
+          <input type="text" class="form-control" id="message-${newRecipient.id}" name="message-${newRecipient.id}" placeholder="Message">
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-md-6 offset-md-4">
+          <button type="button" class="btn btn-success item-button add-recipient" id="add-recipient-${newRecipient.id}" name="add-recipient">Add New Recipient</button>
+          <button type="button" class="btn btn-danger item-button remove-recipient" id="remove-recipient-${newRecipient.id}" name="remove-recipient">Remove</button>
+        </div>
+      </div>
+    </fieldset>`;
+
+  $(html).insertBefore('#submit-fieldset').hide().show(animationTime);
+  updateButtonRow();
+  setAddRemoveRecipientStatus();
+
+  $(`#add-recipient-${newRecipient.id}`).click(() => {
+    addNewRecipient();
+  });
+
+  // Validate Name
+  $(`#name-${newRecipient.id}`).focusout(function callback() {
+    validateInput($(this));
+    $(`.recipient-legend-name-${newRecipient.id}`).text($(this).val());
+  });
+
+  // Validate Telephone Number
+  $(`#telephone-${newRecipient.id}`).focusout(function callback() {
+    validateInput($(this));
+  });
+
+  // Address
+  setUpAddressDropdown(newRecipient.id);
+  $(`#address-${newRecipient.id}`).focusout(() => validateGoogleAddress(newRecipient.id));
+}
+
 // On DOM Loaded...
 $(() => {
   // Select Items
   $('select[id^=quantity-]').change(() => {
+    updateItems();
+    updateButtonRow();
     setDelivery();
     showPurchaserDetails();
     updatePrice();
@@ -224,6 +412,11 @@ $(() => {
   $('#collection').click(() => {
     $('#user-delivery').hide(animationTime);
     updatePrice();
+  });
+
+  $('#split-delivery').click(() => {
+    $('#user-delivery').hide(animationTime);
+    addNewRecipient();
   });
 
   // Address

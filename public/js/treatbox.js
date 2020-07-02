@@ -74,13 +74,17 @@ function getDetailsFromId(htmlId) {
   return { field, id };
 }
 
-function priceFormat(num, includeSymbol = true) {
+function priceFormat(num, userOptions = {}) {
+  const options = {
+    includeSymbol: userOptions.includeSymbol || true,
+    includeOre: userOptions.includeOre || false
+  }
   let str = (num / 100).toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    minimumFractionDigits: options.includeOre ? 2 : 0,
+    maximumFractionDigits: options.includeOre ? 2 : 0
   });
   str = str.replace(',', '');
-  str += includeSymbol ? ' SEK' : '';
+  str += options.includeSymbol ? ' SEK' : '';
   return str;
 }
 
@@ -119,9 +123,9 @@ function updatePrice() {
   }).then((data) => {
     if (data.status === 'OK') {
       $('#food-cost').text(priceFormat(data.bottomLine.foodCost));
-      $('#food-moms').text(priceFormat(data.bottomLine.foodMoms));
+      $('#food-moms').text(priceFormat(data.bottomLine.foodMoms, { includeOre: true }));
       $('#delivery-cost').text(priceFormat(data.bottomLine.deliveryCost));
-      $('#delivery-moms').text(priceFormat(data.bottomLine.deliveryMoms));
+      $('#delivery-moms').text(priceFormat(data.bottomLine.deliveryMoms, { includeOre: true }));
       $('#total-cost').text(priceFormat(data.bottomLine.total));
       $('.zone2-surcharge-amount').text(priceFormat(data.delivery.zone2Price))
     }

@@ -214,7 +214,7 @@ switch (body['delivery-type']) {
     </tr>
     <tr>
       <th class="order-total" colspan="3" scope="row">MOMs</th>
-      <td id="moms-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.totalMoms) %></td>
+      <td id="moms-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.totalMoms, { includeOre: true }) %></td>
     </tr>
     <tr>
       <th class="order-total" colspan="3" scope="row">Total Cost</th>
@@ -226,12 +226,12 @@ switch (body['delivery-type']) {
 let text;
 switch (body['delivery-type']) {
   case 'collection':
-    text = 'Please note that your items must be picked up from our store at Vikingagatan 18 between 10:30am and 11:30am on Wednesday.';
+    text = `Please note that your items must be picked up from our store at Vikingagatan 18 between 10:30am and 11:30am on ${dateFormat(parseDateCode(body.date))}.`;
     break;
 
   case 'delivery':
   case 'split-delivery':
-    text = 'Your items will be delivered on Wednesday between Midday and 3pm';
+    text = `Your items will be delivered on ${dateFormat(parseDateCode(body.date))} between Midday and 3pm`;
     break;
   }
 %>  <p><%=text %></p>

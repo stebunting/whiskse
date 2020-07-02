@@ -280,9 +280,9 @@ function updateButtonRow() {
       const selector = `${recipient.id}-item-${item.id}-${index}`;
       $(`#${selector}`).click(() => {
         if (item.recipient !== null) {
-          item.recipient = null;
+          items[index].recipient = null;
         } else {
-          item.recipient = recipient.id;
+          items[index].recipient = recipient.id;
         }
         updateButtonRow();
         updateTextAreas();
@@ -290,16 +290,30 @@ function updateButtonRow() {
       });
     });
   });
+  $('#recipient-split').val(JSON.stringify(items));
+}
+
+function removeRecipient(id) {
+  items.map((x) => {
+    if (x.recipient === id) {
+      x.recipient = null;
+    }
+    return x;
+  });
+
+  $(`#recipient-${id}`).remove();
+  updatePrice();
+  updateButtonRow();
+  setAddRemoveRecipientStatus();
 }
 
 function addNewRecipient() {
   const newRecipient = { id: recipients.length };
   recipients.push(newRecipient);
 
-  const legendHeader = `Recipient ${newRecipient.id + 1}`;
   const html = `
       <fieldset class="form-group" id="recipient-${newRecipient.id}">
-      <legend class="recipient-legend-name-${newRecipient.id}">${legendHeader}</legend>
+      <legend class="recipient-legend-name-${newRecipient.id}">Recipient</legend>
 
       <div class="form-group row">
         <label for="buttons" class="col-md-4 col-form-label">Select items to deliver</label>
@@ -307,7 +321,7 @@ function addNewRecipient() {
       </div>
     
       <div class="form-group row">
-        <label for="items-to-deliver" class="col-md-4 col-form-label"><span class="recipient-legend-name-${newRecipient.id}">${legendHeader}</span> will receive</label>
+        <label for="items-to-deliver" class="col-md-4 col-form-label"><span class="recipient-legend-name-${newRecipient.id}">Recipient</span> will receive</label>
         <div class="col-md-6">
           <textarea class="form-control" form-validation-type="notes" height="5" id="items-to-deliver-${newRecipient.id}" name="items-to-deliver-${newRecipient.id}" readonly="true">Select items from above</textarea>
           <input type="hidden" name="recipient-num-comboboxes-${newRecipient.id}" id="recipient-num-comboboxes-${newRecipient.id}" value="0" />
@@ -368,6 +382,9 @@ function addNewRecipient() {
 
   $(`#add-recipient-${newRecipient.id}`).click(() => {
     addNewRecipient();
+  });
+  $(`#remove-recipient-${newRecipient.id}`).click(() => {
+    removeRecipient(newRecipient.id);
   });
 
   // Validate Name

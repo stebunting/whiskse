@@ -19,7 +19,7 @@ let deliverable = false;
 let zone3delivery = false;
 let basket = [];
 let items = [];
-const recipients = [];
+let recipients = [];
 
 // Show Purchaser/Delivery Details if hidden
 function showPurchaserDetails() {
@@ -231,7 +231,7 @@ function setUpAddressDropdown(recipientId) {
 function updateTextAreas() {
   recipients.forEach((recipient) => {
     const recipientsItems = items
-      .filter((x) => x.recipient === recipient.id)
+      .filter((x) => x.recipient === recipient)
       .map((x) => x.name)
       .sort();
     const counts = {};
@@ -239,7 +239,7 @@ function updateTextAreas() {
       counts[item] = (counts[item] || 0) + 1;
     });
     const listItems = Object.entries(counts).map((x) => `${x[1]} x ${x[0]}`);
-    $(`#items-to-deliver-${recipient.id}`).val(listItems.join(', '));
+    $(`#items-to-deliver-${recipient}`).val(listItems.join(', '));
   });
 }
 
@@ -247,7 +247,7 @@ function setAddRemoveRecipientStatus() {
   const unassignedItems = items.filter((x) => x.recipient === null).length;
   let assigned = recipients.length;
   for (let i = 0; i < recipients.length; i += 1) {
-    if (items.filter((x) => x.recipient === recipients[i].id).length > 0) {
+    if (items.filter((x) => x.recipient === recipients[i]).length > 0) {
       assigned -= 1;
     }
   }
@@ -262,116 +262,123 @@ function updateButtonRow() {
   recipients.forEach((recipient) => {
     let buttons = '';
     items.forEach((item, index) => {
-      const selector = `${recipient.id}-item-${item.id}-${index}`;
+      const selector = `${recipient}-item-${item.id}-${index}`;
       let buttonType = 'btn-info';
       let cross = '';
       let disabled = '';
       if (item.recipient !== null) {
         cross = '&times; ';
         buttonType = 'btn-secondary';
-        if (item.recipient !== recipient.id) {
+        if (item.recipient !== recipient) {
           disabled = ' disabled="true"';
         }
       }
       buttons += `<button type="button" class="btn ${buttonType} item-button btn-sm" id="${selector}" name="${selector}"${disabled}>${cross}${item.name}</button>`;
     });
-    $(`#button-row-${recipient.id}`).html(buttons);
+    $(`#button-row-${recipient}`).html(buttons);
     items.forEach((item, index) => {
-      const selector = `${recipient.id}-item-${item.id}-${index}`;
+      const selector = `${recipient}-item-${item.id}-${index}`;
       $(`#${selector}`).click(() => {
         if (item.recipient !== null) {
           items[index].recipient = null;
         } else {
-          items[index].recipient = recipient.id;
+          items[index].recipient = recipient;
         }
         updateButtonRow();
         updateTextAreas();
         setAddRemoveRecipientStatus();
+        validateInput($(`#items-to-deliver-${recipient}`));
       });
     });
   });
-  $('#recipient-split').val(JSON.stringify(items));
+  $('#items').val(JSON.stringify(items));
 }
 
 function removeRecipient(id) {
   items.map((x) => {
-    if (x.recipient === id) {
-      x.recipient = null;
+    const y = x;
+    if (y.recipient === id) {
+      y.recipient = null;
     }
-    return x;
+    return y;
   });
 
   $(`#recipient-${id}`).remove();
+  const index = recipients.findIndex((x) => x === id);
+  recipients.splice(index, 1);
+  $('#recipients').val(JSON.stringify(recipients));
+
   updatePrice();
   updateButtonRow();
   setAddRemoveRecipientStatus();
 }
 
 function addNewRecipient() {
-  const newRecipient = { id: recipients.length };
-  recipients.push(newRecipient);
+  let id = 0;
+  if (recipients.length > 0) {
+    id = recipients[recipients.length - 1] + 1;
+  }
+  recipients.push(id);
+  $('#recipients').val(JSON.stringify(recipients));
 
   const html = `
-      <fieldset class="form-group" id="recipient-${newRecipient.id}">
-      <legend class="recipient-legend-name-${newRecipient.id}">Recipient</legend>
+      <fieldset class="form-group" id="recipient-${id}">
+      <legend class="recipient-legend-name-${id}">Recipient</legend>
 
       <div class="form-group row">
         <label for="buttons" class="col-md-4 col-form-label">Select items to deliver</label>
-        <div class="col-md-8 button-row" id="button-row-${newRecipient.id}"></div>
+        <div class="col-md-8 button-row" id="button-row-${id}"></div>
       </div>
     
       <div class="form-group row">
-        <label for="items-to-deliver" class="col-md-4 col-form-label"><span class="recipient-legend-name-${newRecipient.id}">Recipient</span> will receive</label>
+        <label for="items-to-deliver" class="col-md-4 col-form-label"><span class="recipient-legend-name-${id}">Recipient</span> will receive</label>
         <div class="col-md-6">
-          <textarea class="form-control" form-validation-type="notes" height="5" id="items-to-deliver-${newRecipient.id}" name="items-to-deliver-${newRecipient.id}" readonly="true">Select items from above</textarea>
-          <input type="hidden" name="recipient-num-comboboxes-${newRecipient.id}" id="recipient-num-comboboxes-${newRecipient.id}" value="0" />
-          <input type="hidden" name="recipient-num-treatboxes-${newRecipient.id}" id="recipient-num-treatboxes-${newRecipient.id}" value="0" />
-          <input type="hidden" name="recipient-num-vegetableboxes-${newRecipient.id}" id="recipient-num-vegetableboxes-${newRecipient.id}" value="0" />
+          <textarea class="form-control" form-validation-type="notes" height="5" id="items-to-deliver-${id}" name="items-to-deliver-${id}" readonly="true">Select items from above</textarea>
         </div>
       </div>
 
       <div class="form-group row">
-        <label for="name-${newRecipient.id}" class="col-md-4 col-form-label">Name</label>
+        <label for="name-${id}" class="col-md-4 col-form-label">Name</label>
         <div class="col-md-6">
-          <input type="text" class="form-control" form-validation-type="name" id="name-${newRecipient.id}" name="name-${newRecipient.id}" placeholder="Name">
+          <input type="text" class="form-control" form-validation-type="name" id="name-${id}" name="name-${id}" placeholder="Name">
         </div>
       </div>
       
       <div class="form-group row">
-        <label for="telephone-${newRecipient.id}" class="col-md-4 col-form-label">Telephone Number</label>
+        <label for="telephone-${id}" class="col-md-4 col-form-label">Telephone Number</label>
         <div class="col-md-6">
-          <input type="telephone" class="form-control" form-validation-type="phone" id="telephone-${newRecipient.id}" name="telephone-${newRecipient.id}" placeholder="Telephone Number">
+          <input type="telephone" class="form-control" form-validation-type="phone" id="telephone-${id}" name="telephone-${id}" placeholder="Telephone Number">
         </div>
       </div>
 
       <div class="form-group row">
-        <label for="address-${newRecipient.id}" class="col-md-4 col-form-label">Address</label>
+        <label for="address-${id}" class="col-md-4 col-form-label">Address</label>
         <div class="col-md-6">
-          <input type="text" class="form-control" id="address-${newRecipient.id}" name="address-${newRecipient.id}" autocomplete="off" placeholder="Address">
-          <input type="hidden" id="zone-${newRecipient.id}" name="zone-${newRecipient.id}">
-          <input type="hidden" id="google-formatted-address-${newRecipient.id}" name="google-formatted-address-${newRecipient.id}">
-          <div id="message-address-${newRecipient.id}"></div>
+          <input type="text" class="form-control" id="address-${id}" name="address-${id}" autocomplete="off" placeholder="Address">
+          <input type="hidden" id="zone-${id}" name="zone-${id}">
+          <input type="hidden" id="google-formatted-address-${id}" name="google-formatted-address-${id}">
+          <div id="message-address-${id}"></div>
         </div>
       </div>
       
       <div class="form-group row">
-        <label for="notes-address-${newRecipient.id}" class="col-md-4 col-form-label">Delivery Notes<br />(please include doorcode and floor)</label>
+        <label for="notes-address-${id}" class="col-md-4 col-form-label">Delivery Notes<br />(please include doorcode and floor)</label>
         <div class="col-md-6">
-          <input type="text" class="form-control" id="notes-address-${newRecipient.id}" name="notes-address-${newRecipient.id}" placeholder="Delivery Notes">
+          <input type="text" class="form-control" id="notes-address-${id}" name="notes-address-${id}" placeholder="Delivery Notes">
         </div>
       </div>
       
       <div class="form-group row">
-        <label for="message-${newRecipient.id}" class="col-md-4 col-form-label">Optional Message</label>
+        <label for="message-${id}" class="col-md-4 col-form-label">Optional Message</label>
         <div class="col-md-6">
-          <input type="text" class="form-control" id="message-${newRecipient.id}" name="message-${newRecipient.id}" placeholder="Message">
+          <input type="text" class="form-control" id="message-${id}" name="message-${id}" placeholder="Message">
         </div>
       </div>
 
       <div class="form-group row">
         <div class="col-md-6 offset-md-4">
-          <button type="button" class="btn btn-success item-button add-recipient" id="add-recipient-${newRecipient.id}" name="add-recipient">Add New Recipient</button>
-          <button type="button" class="btn btn-danger item-button remove-recipient" id="remove-recipient-${newRecipient.id}" name="remove-recipient">Remove</button>
+          <button type="button" class="btn btn-success item-button add-recipient" id="add-recipient-${id}" name="add-recipient">Add New Recipient</button>
+          <button type="button" class="btn btn-danger item-button removerecipient" id="removerecipient-${id}" name="removerecipient">Remove</button>
         </div>
       </div>
     </fieldset>`;
@@ -380,27 +387,42 @@ function addNewRecipient() {
   updateButtonRow();
   setAddRemoveRecipientStatus();
 
-  $(`#add-recipient-${newRecipient.id}`).click(() => {
+  $(`#add-recipient-${id}`).click(() => {
     addNewRecipient();
   });
-  $(`#remove-recipient-${newRecipient.id}`).click(() => {
-    removeRecipient(newRecipient.id);
+  $(`#removerecipient-${id}`).click(() => {
+    removeRecipient(id);
   });
 
   // Validate Name
-  $(`#name-${newRecipient.id}`).focusout(function callback() {
+  $(`#name-${id}`).focusout(function callback() {
     validateInput($(this));
-    $(`.recipient-legend-name-${newRecipient.id}`).text($(this).val());
+    $(`.recipient-legend-name-${id}`).text($(this).val());
   });
 
   // Validate Telephone Number
-  $(`#telephone-${newRecipient.id}`).focusout(function callback() {
+  $(`#telephone-${id}`).focusout(function callback() {
     validateInput($(this));
   });
 
   // Address
-  setUpAddressDropdown(newRecipient.id);
-  $(`#address-${newRecipient.id}`).focusout(() => validateGoogleAddress(newRecipient.id));
+  setUpAddressDropdown(id);
+  $(`#address-${id}`).focusout(() => validateGoogleAddress(id));
+}
+
+function getIdFromSelector(selector) {
+  let [, id] = selector.attr('id').split('-');
+  if (id != null) {
+    id = parseInt(id, 10);
+  }
+  return id;
+}
+
+function touchAllInputs() {
+  $('input[id^=name], input[id^=email], input[id^=telephone], input[id^=address]').focusout();
+  $('textarea[id^=items-to-deliver]').each(function callback() {
+    validateInput($(this));
+  })
 }
 
 // On DOM Loaded...
@@ -415,7 +437,19 @@ $(() => {
   });
 
   // Validate User Details as they are entered
-  $('#name, #email, #telephone').focusout(function callback() {
+  $('input[id^=name]').focusout(function callback() {
+    const id = getIdFromSelector($(this));
+    if (id != null) {
+      let name = $(this).val();
+      let index = recipients.findIndex((x) => x === id);
+      if (name === '') {
+        name = `Recipient ${index + 1}`;
+      }
+      $(`.recipient-legend-name-${id}`).text(name);
+    }
+    validateInput($(this));
+  });
+  $('input[id^=email], input[id^=telephone]').focusout(function callback() {
     validateInput($(this));
   });
 
@@ -433,12 +467,28 @@ $(() => {
 
   $('#split-delivery').click(() => {
     $('#user-delivery').hide(animationTime);
-    addNewRecipient();
+    if (recipients.length === 0) {
+      addNewRecipient();
+    }
   });
 
   // Address
-  setUpAddressDropdown();
-  $('#address').focusout(() => validateGoogleAddress());
+  $('input[id^=address]').each(function callback() {
+    const id = getIdFromSelector($(this));
+    setUpAddressDropdown(id);
+    $(this).focusout(() => validateGoogleAddress(id));
+  });
+
+  // Set up Add Recipient Button
+  $('.add-recipient').click(() => {
+    addNewRecipient();
+  });
+  $('.removerecipient').each(function callback() {
+    const id = getIdFromSelector($(this));
+    $(this).click(() => {
+      removeRecipient(id);
+    });
+  });
 
   // Hide Loading Spinner and Show Page
   $('#loading-div').hide(animationTime);
@@ -446,6 +496,14 @@ $(() => {
 
   // Check if form is posted
   if (post) {
+    if (deliveryType === 'split-delivery') {
+      items = JSON.parse($('#items').val());
+      recipients = JSON.parse($('#recipients').val());
+      updateButtonRow();
+      updateTextAreas();
+      setAddRemoveRecipientStatus();
+      touchAllInputs();
+    }
     $('select[id^=quantity-]:first').trigger('change');
     $(`input[name=delivery-type][value=${deliveryType}`).click();
   }

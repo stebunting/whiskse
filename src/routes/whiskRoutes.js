@@ -4,6 +4,7 @@ const tag = 'whiskse:whiskRoutes';
 // Requirements
 const express = require('express');
 const debug = require('debug')(tag);
+const { treatboxOrderForm, treatboxConfirmation } = require('../controllers/whiskController.js')();
 
 // Constants
 const googleApiKey = process.env.GOOGLE_API_KEY;
@@ -14,6 +15,21 @@ function routes() {
 
   whiskRoutes.route('/')
     .get((req, res) => res.render('index', { googleApiKey, page: 'index' }));
+
+  whiskRoutes.route('/treatbox')
+    .get(treatboxOrderForm)
+    .post(treatboxOrderForm);
+
+  whiskRoutes.route('/treatboxconfirm')
+    .get((req, res) => res.redirect('/treatbox'))
+    .post(treatboxConfirmation);
+
+  whiskRoutes.route('/orderplaced')
+    .get((req, res) => res.render('orderplaced', {
+      googleApiKey,
+      page: 'menu',
+      query: req.query
+    }));
 
   whiskRoutes.route('/menu')
     .get((req, res) => res.render('menu', { googleApiKey, page: 'menu' }));
@@ -26,6 +42,9 @@ function routes() {
 
   whiskRoutes.route('/faq')
     .get((req, res) => res.render('faq', { googleApiKey, page: 'faq' }));
+
+  whiskRoutes.route('/management')
+    .get((req, res) => res.redirect('https://whisk-management.herokuapp.com'));
 
   return whiskRoutes;
 }

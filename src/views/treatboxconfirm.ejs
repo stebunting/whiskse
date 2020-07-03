@@ -1,0 +1,263 @@
+<%-include('partials/header', {
+  page,
+  title: 'Whisk Treat Boxes',
+  headerDisplay: true,
+  header: 'Order Confirmation'
+}); %><%
+
+body['callback-url'] = orderPlacedUrl;
+
+errorMessages = [];
+if (query.status) {
+  const messages = query.status.split(',');
+
+  messages.forEach((message) => {
+    switch (message) {
+      case 'INVALID_UUID':
+        errorMessages.push('Invalid UUID returned.');
+        break;
+
+      case 'DECLINED':
+        errorMessages.push('Transaction Declined by Customer.');
+        break;
+
+      case 'ERROR':
+        errorMessages.push('An Unknown Error Occured.');
+        break;
+
+      case 'ACMT03':
+        errorMessages.push('Unknown Swish ID, payer not enrolled. Please check your phone number.');
+        break;
+
+      case 'FF08':
+        errorMessages.push('PaymentReference is invalid.');
+        break;
+
+      case 'RP03':
+        errorMessages.push('Callback URL is missing or does not use HTTPS.');
+        break;
+
+      case 'BE18':
+        errorMessages.push('Payer alias is invalid.');
+        break;
+
+      case 'RP01':
+        errorMessages.push('Missing Merchant Swish Number.');
+        break;
+
+      case 'PA02':
+        errorMessages.push('Amount value is missing or not a valid number.');
+        break;
+
+      case 'AM06':
+        errorMessages.push('Specified transaction amount is less than agreed minimum.');
+        break;
+
+      case 'AM02':
+        errorMessages.push('Amount value is too large.');
+        break;
+
+      case 'AM03':
+        errorMessages.push('Invalid or missing Currency.');
+        break;
+
+      case 'RP02':
+        errorMessages.push('Wrong formatted message.');
+        break;
+
+      case 'RP06':
+        errorMessages.push('A payment request already exists for that payer.');
+        break;
+
+      case 'ACMT01':
+        errorMessages.push('Counterpart is not activated.');
+        break;
+   
+      case 'ACMT07':
+        errorMessages.push('Payee not Enrolled.');
+        break;
+
+      default:
+        break;
+    }
+  });
+}
+
+let delivery;
+switch (body['delivery-type']) {
+  case 'collection':
+    delivery = "Collection from Whisk";
+    break;
+
+  case 'delivery':
+    delivery = "Home Delivery";
+    break;
+
+  case 'split-delivery':
+    delivery = "Delivery to another person";
+    break;
+
+  default:
+    delivery = "FAULT!";
+    break;
+} %>
+
+  <p>Please check your order before comfirming below.</p>
+
+  <ul class="error-message"><%
+      errorMessages.forEach((message) => { %>
+      <li><%=message %></li>
+    <% }); %></ul>
+
+  <h2>Your Details</h2>
+  <table class="table table-striped table-bordered table-hover">
+    <tr>
+      <th class="table-label" scope="row">Name</th>
+      <td><%=body.name %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">E-mail</th>
+      <td><%=body.email %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">Telephone Number</th>
+      <td><%=body.telephone %></td>
+    </tr>
+  </table>
+
+  <h2>Delivery</h2>
+  <table class="table table-striped table-bordered table-hover">
+    <tr>
+      <th class="table-label" scope="row">Date</th>
+      <td><%=dateFormat(parseDateCode(body.date)) %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">Delivery</th>
+      <td><%=delivery %></td>
+    </tr>
+<% if (delivery === "Home Delivery") { %>
+    <tr>
+      <th class="table-label" scope="row">Address</th>
+      <td><%=body.address %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">Delivery Notes</th>
+      <td><%=body['notes-address'] %></td>
+    </tr><% }
+  %>  </table><%
+
+    if (delivery === "Delivery to another person") {
+    const recipients = JSON.parse(body.recipients);
+    recipients.forEach((recipient, index) => { %>
+
+  <h2><%=`Person ${index + 1}` %></h2>
+  <table class="table table-striped table-bordered table-hover">
+    <tr>
+      <th class="table-label" scope="row">Name</th>
+      <td><%=body[`name-${recipient}`] %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">Items for <%=body[`name-${recipient}`] %></th>
+      <td><%=body[`items-to-deliver-${recipient}`] %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">Telephone Number</th>
+      <td><%=body[`telephone-${recipient}`] %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">Address</th>
+      <td><%=body[`address-${recipient}`] %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">Delivery Notes</th>
+      <td><%=body[`notes-address-${recipient}`] %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">Message</th>
+      <td><%=body[`message-${recipient}`] %></td>
+    </tr>
+  </table><%
+
+  });
+} %>
+
+  <h2>Your Order</h2>
+  <table class="table table-striped table-bordered table-hover">
+    <tr>
+      <th class="order-item column">Item</th>
+      <th class="order-quantity column">Quantity</th>
+      <th class="order-price column">Price</th>
+      <th class="order-subtotal column">Sub-Total</th>
+    </tr>
+    <% for (let i = 0; i < priceInformation.products.length; i += 1) {
+        const product = priceInformation.products[i]; %>
+    <tr>
+      <td class="order-item"><%=product.name %></td>
+      <td id="combobox-quantity" class="order-quantity"><%=product.quantity %></td>
+      <td id="combobox-price" class="order-price"><%=priceFormat(product.price) %></td>
+      <td id="combobox-subtotal" class="order-subtotal"><%=priceFormat(product.subTotal) %></td>
+    </tr>
+    <% } %>
+    <tr>
+      <th class="order-total" colspan="3" scope="row">Food Cost</th>
+      <td id="food-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.foodCost) %></td>
+    </tr>
+    <tr>
+      <th class="order-total" colspan="3" scope="row">Delivery Cost</th>
+      <td id="delivery-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.deliveryCost) %></td>
+    </tr>
+    <tr>
+      <th class="order-total" colspan="3" scope="row">MOMs</th>
+      <td id="moms-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.totalMoms, { includeOre: true }) %></td>
+    </tr>
+    <tr>
+      <th class="order-total" colspan="3" scope="row">Total Cost</th>
+      <th id="total-to-pay" class="order-subtotal" scope="row"><%=priceFormat(priceInformation.bottomLine.total) %></th>
+    </tr>
+  </table>
+
+<%
+let text;
+switch (body['delivery-type']) {
+  case 'collection':
+    text = `Please note that your items must be picked up from our store at Vikingagatan 18 between 10:30am and 11:30am on ${dateFormat(parseDateCode(body.date))}.`;
+    break;
+
+  case 'delivery':
+  case 'split-delivery':
+    text = `Your items will be delivered on ${dateFormat(parseDateCode(body.date))} between Midday and 3pm`;
+    break;
+  }
+%>  <p><%=text %></p>
+
+  <h2>Payment</h2>
+  <form method="post" action="<%=formSubmitUrl %>" id="submitform">
+
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="payment-method" id="swish" value="Swish" checked="true">
+      <label class="form-check-label" for="swish">Swish</label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="payment-method" id="invoice" value="Invoice">
+      <label class="form-check-label" for="invoice">Invoice</label>
+    </div>
+    <ul class="error-message"><%
+      errorMessages.forEach((message) => {
+        %><li><%=message %></li>
+      <% });
+    %></ul>
+    <%
+    for (const [name, value] of Object.entries(body)) {
+      if (name !== 'payment-method') {
+        %><input type="hidden" name="<%=name %>" value="<%=value %>" /><%
+      }
+    }
+    %>
+
+    <button class="btn btn-primary" type="submit" formaction="<%=amendUrl %>" value="amend">Amend</button>
+    <button class="btn btn-success" type="submit" id="submitorder" value="submit">Order and Pay</button>
+    <div class="open-swish">Please open Swish on your mobile phone to confirm the payment</div>
+  </form>
+<%-include('partials/footer', {
+  page
+}); %>

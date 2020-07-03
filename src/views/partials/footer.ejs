@@ -46,27 +46,26 @@
 <!-- Whisk JS -->
 <script src="/js/instagram.js"></script><%
 
-if (page === 'treatboxes') { %>
+if (page === 'treatbox') { %>
 <script src="/js/date.format.js"></script>
 <script src="/js/form-verification.js"></script>
-<script src="/js/treatboxes.js" type="module"></script><%
+<script src="/js/treatbox.js" type="module"></script><%
 
-} else if (page === 'treatbox-confirm') { %>
+} else if (page === 'treatboxconfirm') { %>
 <script src="/js/treatbox-confirm.js"></script><%
 
 } else if (page === 'menu') { %>
 <script src="/js/menu.js"></script><%
 } %>
 
-<!-- Google Maps JS --><%
-if (page === 'treatboxes') { %>
-<script src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&libraries=places,geometry&callback=initMap"></script>
-<%
+<!-- Google Maps JS -->
+<script src="/js/googlemap.js"></script><%
+if (page === 'treatbox') { %>
+<script src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&libraries=places,geometry&callback=initMap"></script><%
 
 } else { %>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&callback=initMap"></script>
-<% }
-%><script src="/js/googlemap.js"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&callback=initMap"></script><%
+} %>
 
 <!-- Bootstrap Required JS -->
 <script src="/js/bootstrap.bundle.min.js"></script>

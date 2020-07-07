@@ -11,6 +11,7 @@ const debug = require('debug')(tag);
 // App configuration
 const app = express();
 const port = process.env.PORT || 3000;
+app.enable('trust proxy');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');

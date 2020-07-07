@@ -10,8 +10,8 @@ import {
 initialise();
 
 // Constants
-const managementBaseUrl = 'http://127.0.0.1:5000';
-// const managementBaseUrl = 'https://whisk-management.herokuapp.com';
+// const managementBaseUrl = 'http://127.0.0.1:5000';
+const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const animationTime = 400;
 
 // User Choices

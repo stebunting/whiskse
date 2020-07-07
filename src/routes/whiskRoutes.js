@@ -16,12 +16,12 @@ function routes() {
   whiskRoutes.route('/')
     .get((req, res) => res.render('index', { googleApiKey, page: 'index' }));
 
-  whiskRoutes.route('/treatbox')
+  whiskRoutes.route('/treatboxorder')
     .get(treatboxOrderForm)
     .post(treatboxOrderForm);
 
   whiskRoutes.route('/treatboxconfirm')
-    .get((req, res) => res.redirect('/treatbox'))
+    .get((req, res) => res.redirect('/treatboxorder'))
     .post(treatboxConfirmation);
 
   whiskRoutes.route('/orderplaced')

@@ -38,7 +38,7 @@ function whiskController() {
 
   async function treatboxConfirmation(req, res) {
     // Get URLs
-    const amendUrl = new URL(`${req.protocol}://${req.get('host')}/treatbox`);
+    const amendUrl = new URL(`${req.protocol}://${req.get('host')}/treatboxorder`);
     const orderPlacedUrl = new URL(`${req.protocol}://${req.get('host')}/orderplaced`);
     const formSubmitUrl = new URL(`${managementBaseUrl}/treatbox/payment`);
 

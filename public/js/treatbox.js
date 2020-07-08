@@ -134,7 +134,7 @@ function updatePrice() {
   let zone2Deliveries = 0;
   if (!$('#collection').is(':checked')) {
     $('input[id^=zone]').each(function callback() {
-      if ($(this).val() === '2') {
+      if ($(this).val() === '2' || (zone3delivery && $(this).val() === '3')) {
         zone2Deliveries += 1;
       }
     });
@@ -425,6 +425,10 @@ function touchAllInputs() {
   })
 }
 
+function touchAllAddresses() {
+  $('input[id^=address]').focusout();
+}
+
 // On DOM Loaded...
 $(() => {
   // Select Items
@@ -487,6 +491,37 @@ $(() => {
     const id = getIdFromSelector($(this));
     $(this).click(() => {
       removeRecipient(id);
+    });
+  });
+
+  // Apply Rebate Code
+  $('#rebate-apply').click(() => {
+    const code = $('#rebate-code').val();
+
+    $.ajax({
+      method: 'get',
+      url: `${managementBaseUrl}/treatbox/lookuprebate`,
+      data: {
+        code
+      }
+    }).done((data) => {
+      if (data.valid) {
+        switch (data.code.type) {
+          case 'zone3delivery':
+            zone3delivery = true;
+            touchAllAddresses();
+            updatePrice();
+            break;
+
+          default:
+            break;
+        }
+        $('#message-rebate-code').text('Code Applied!');
+      } else {
+        $('#message-rebate-code').text('Invalid Code');
+      }
+    }).catch((error) => {
+      $('#message-rebate-code').text('There was an error looking up your code');
     });
   });
 

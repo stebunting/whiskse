@@ -3,3 +3,4 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/whiskse/app
     - /bin/cp -R * $DEPLOYPATH
+    - /bin/touch $DEPLOYPATH/tmp/restart.txt

@@ -628,13 +628,8 @@ select {
   display: none;
 }
 
-#rebate-code-div {
-  display: none;
-}
-
 #message-rebate-code {
   color: #FF0000;
-  display: none;
 }
 
 .treatbox-form-header {

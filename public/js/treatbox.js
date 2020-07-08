@@ -10,7 +10,7 @@ import {
 initialise();
 
 // Constants
-// const managementBaseUrl = 'http://127.0.0.1:5000';
+// const managementBaseUrl = 'http://localhost:5000';
 const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const animationTime = 400;
 
@@ -132,14 +132,27 @@ function updatePrice() {
   });
 
   let zone2Deliveries = 0;
+  let zone3Deliveries = 0;
   if (!$('#collection').is(':checked')) {
     $('input[id^=zone]').each(function callback() {
-      if ($(this).val() === '2' || (zone3delivery && $(this).val() === '3')) {
-        zone2Deliveries += 1;
+      const postfix = getDetailsFromId($(this).attr('id'));
+      let inputIdSelector = $('#address');
+      if (postfix.id != null) {
+        inputIdSelector = $(`#address-${postfix.id}`);
+      }
+      if (inputIdSelector.is(':visible')) {
+        if ($(this).val() === '2') {
+          zone2Deliveries += 1;
+        } else if (zone3delivery && $(this).val() === '3') {
+          zone3Deliveries += 1;
+        }
       }
     });
   }
-  const delivery = JSON.stringify({ zone2: zone2Deliveries });
+  const delivery = JSON.stringify({
+    zone2: zone2Deliveries,
+    zone3: zone3Deliveries
+  });
 
   $.ajax({
     method: 'post',
@@ -155,7 +168,12 @@ function updatePrice() {
       $('#delivery-cost').text(priceFormat(data.bottomLine.deliveryCost));
       $('#delivery-moms').text(priceFormat(data.bottomLine.deliveryMoms, { includeOre: true }));
       $('#total-cost').text(priceFormat(data.bottomLine.total));
-      $('.zone2-surcharge-amount').text(priceFormat(data.delivery.zone2Price));
+      if (data.delivery.zone2) {
+        $('.zone2-surcharge-amount').text(priceFormat(data.delivery.zone2.price));
+      }
+      if (data.delivery.zone3) {
+        $('.zone3-surcharge-amount').text(priceFormat(data.delivery.zone3.price));
+      }
     }
   });
 }
@@ -185,7 +203,7 @@ function validateGoogleAddress(recipientId) {
   } else if (zone === 2) {
     message = 'Zone 2 // <span class="zone2-surcharge-amount"></span> Surcharge';
   } else if (zone3delivery) {
-    message = 'Zone 3 // <span class="zone2-surcharge-amount"></span> Surcharge';
+    message = 'Zone 3 // <span class="zone3-surcharge-amount"></span> Surcharge';
   } else {
     message = 'Outside Delivery Area';
     valid = false;
@@ -422,7 +440,7 @@ function touchAllInputs() {
   $('input[id^=name], input[id^=email], input[id^=telephone], input[id^=address]').focusout();
   $('textarea[id^=items-to-deliver]').each(function callback() {
     validateInput($(this));
-  })
+  });
 }
 
 function touchAllAddresses() {
@@ -445,7 +463,7 @@ $(() => {
     const id = getIdFromSelector($(this));
     if (id != null) {
       let name = $(this).val();
-      let index = recipients.findIndex((x) => x === id);
+      const index = recipients.findIndex((x) => x === id);
       if (name === '') {
         name = `Recipient ${index + 1}`;
       }
@@ -459,18 +477,28 @@ $(() => {
 
   // Delivery Type
   $('#delivery').click(() => {
-    $('#user-delivery').show(animationTime);
+    const recipientsHidden = $('fieldset[id^=recipient').hide(animationTime);
+    const deliveryShown = $('#user-delivery').show(animationTime);
     $('#address, #notes-address').prop('disabled', false);
-    updatePrice();
+    $.when(deliveryShown, recipientsHidden).done(() => {
+      updatePrice();
+    });
   });
 
   $('#collection').click(() => {
-    $('#user-delivery').hide(animationTime);
-    updatePrice();
+    const deliveryHidden = $('#user-delivery').hide(animationTime);
+    const recipientsHidden = $('fieldset[id^=recipient').hide(animationTime);
+    $.when(deliveryHidden, recipientsHidden).done(() => {
+      updatePrice();
+    });
   });
 
   $('#split-delivery').click(() => {
-    $('#user-delivery').hide(animationTime);
+    const deliveryHidden = $('#user-delivery').hide(animationTime);
+    const recipientsShown = $('fieldset[id^=recipient').show(animationTime);
+    $.when(deliveryHidden, recipientsShown).done(() => {
+      updatePrice();
+    });
     if (recipients.length === 0) {
       addNewRecipient();
     }
@@ -520,7 +548,7 @@ $(() => {
       } else {
         $('#message-rebate-code').text('Invalid Code');
       }
-    }).catch((error) => {
+    }).catch(() => {
       $('#message-rebate-code').text('There was an error looking up your code');
     });
   });

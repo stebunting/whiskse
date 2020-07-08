@@ -53,8 +53,21 @@ function whiskController() {
       }
     }
     basket = JSON.stringify(basket);
-    const zone2Deliveries = Object.entries(req.body).filter((x) => x[0].startsWith('zone') && x[1] === '2').length;
-    const delivery = JSON.stringify({ zone2: zone2Deliveries });
+
+    // Get Delivery Information
+    let zone2Deliveries;
+    let zone3Deliveries;
+    if (req.body['delivery-type'] === 'delivery') {
+      zone2Deliveries = req.body['zone'] === '2' ? 1 : 0;
+      zone3Deliveries = req.body['zone'] === '3' ? 1 : 0;
+    } else if (req.body['delivery-type'] === 'split-delivery') {
+      zone2Deliveries = Object.entries(req.body).filter((x) => x[0].startsWith('zone-') && x[1] === '2').length;
+      zone3Deliveries = Object.entries(req.body).filter((x) => x[0].startsWith('zone-') && x[1] === '3').length;
+    }
+    const delivery = JSON.stringify({
+      zone2: zone2Deliveries,
+      zone3: zone3Deliveries
+    });
 
     const axiosConfig = {
       method: 'post',
@@ -71,6 +84,8 @@ function whiskController() {
     } catch (error) {
       debug(error);
     }
+
+    debug(priceInformation);
 
     // Render Page
     return res.render('treatboxconfirm', {

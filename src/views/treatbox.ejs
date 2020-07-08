@@ -135,7 +135,7 @@
           <label for="address" class="col-sm-4 col-form-label">Address</label>
           <div class="col-sm-6">
             <input type="text" class="form-control" id="address" name="address" autocomplete="chrome-off" placeholder="Address" value="<% if (body.address) { %><%=body.address %><% } %>">
-            <input type="hidden" id="zone" name="zone" value="<% if (body.zone) { %><%=body.zone %><% } else { %>3<% } %>">
+            <input type="hidden" id="zone" name="zone" value="<% if (body.zone) { %><%=body.zone %><% } else { %>0<% } %>">
             <input type="hidden" id="google-formatted-address" name="google-formatted-address" value="<% if (body['google-formatted-address']) { %><%=body['google-formatted-address'] %><% } %>">
             <div id="message-address"></div>
           </div>

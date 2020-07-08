@@ -16,6 +16,10 @@ function routes() {
   whiskRoutes.route('/')
     .get((req, res) => res.render('index', { googleApiKey, page: 'index' }));
 
+  // Legacy Redirects
+  whiskRoutes.route(['/treatbox', '/treatboxes.php'])
+    .get((req, res) => res.redirect('/treatboxorder'))
+
   whiskRoutes.route('/treatboxorder')
     .get(treatboxOrderForm)
     .post(treatboxOrderForm);

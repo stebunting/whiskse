@@ -13,7 +13,8 @@ const googleApiKey = process.env.GOOGLE_API_KEY;
 function whiskController() {
   async function treatboxOrderForm(req, res) {
     // Get URLs
-    const confirmationUrl = new URL(`${req.protocol}://${req.get('host')}/treatboxconfirm`);
+    const protocol = req.secure ? 'https' : 'http'
+    const confirmationUrl = new URL(`${protocol}://${req.get('host')}/treatboxconfirm`);
     const formSubmitUrl = new URL(`${managementBaseUrl}/treatbox/confirmation`);
     let apiResponse = {};
     try {
@@ -38,8 +39,9 @@ function whiskController() {
 
   async function treatboxConfirmation(req, res) {
     // Get URLs
-    const amendUrl = new URL(`${req.protocol}://${req.get('host')}/treatboxorder`);
-    const orderPlacedUrl = new URL(`${req.protocol}://${req.get('host')}/orderplaced`);
+    const protocol = req.secure ? 'https' : 'http'
+    const amendUrl = new URL(`${protocol}://${req.get('host')}/treatboxorder`);
+    const orderPlacedUrl = new URL(`${protocol}://${req.get('host')}/orderplaced`);
     const formSubmitUrl = new URL(`${managementBaseUrl}/treatbox/payment`);
 
     // Get Price Information

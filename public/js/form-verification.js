@@ -111,31 +111,3 @@ function validateInput(selector) {
   printMessage(selector, valid);
   return valid;
 }
-
-
-function hideAllMessages() {
-  $('.form-validation-invalid').each(function callback() {
-    $(this).hide();
-  });
-}
-
-function validateItems() {
-  const comboBoxes = parseInt($('#num-comboboxes').val(), 10);
-  const treatBoxes = parseInt($('#num-treatboxes').val(), 10);
-  const vegetableBoxes = parseInt($('#num-vegetableboxes').val(), 10);
-  if ($('#collection').prop('checked')) {
-    return (comboBoxes + treatBoxes + vegetableBoxes) > 0;
-  }
-  if ($('#delivery').prop('checked')) {
-    return (comboBoxes + treatBoxes) > 0;
-  }
-  if ($('#split-delivery').prop('checked')) {
-    const total = comboBoxes + treatBoxes + vegetableBoxes;
-    let runningTotal = 0;
-    $('[id^="recipient-num-"').each(function callback() {
-      runningTotal += parseInt($(this).val(), 10);
-    });
-    return (runningTotal === total);
-  }
-  return false;
-}

@@ -190,10 +190,10 @@ function validateGoogleAddress(recipientId) {
   let valid = true;
   let message;
 
-  if (addressToValidate === '') {
-    valid = null;
-    message = '';
-  } else if (googleAddress !== addressToValidate || Number.isNaN(zone)) {
+  // if (addressToValidate === '') {
+  //   valid = null;
+  //   message = ''; } else
+  if (addressToValidate === '' || googleAddress !== addressToValidate || Number.isNaN(zone)) {
     message = 'Invalid Address, please select from dropdown menu';
     valid = false;
   } else if (zone === 0) {
@@ -210,8 +210,9 @@ function validateGoogleAddress(recipientId) {
   }
 
   printMessage(selector, valid);
-
   $(`#message-address${namePostfix}`).html(message);
+
+  return valid;
 }
 
 // Set up Google Autocomplete
@@ -436,11 +437,21 @@ function getIdFromSelector(selector) {
   return id;
 }
 
-function touchAllInputs() {
-  $('input[id^=name], input[id^=email], input[id^=telephone], input[id^=address]').focusout();
-  $('textarea[id^=items-to-deliver]').each(function callback() {
-    validateInput($(this));
+function validateAllInputs() {
+  let valid = true;
+  $('input[id^=name], input[id^=email], input[id^=telephone], textarea[id^=items-to-deliver]').each(function callback() {
+    if ($(this).is(':visible')) {
+      valid = validateInput($(this)) && valid;
+    }
   });
+  $('input[id^=address]').each(function callback() {
+    if ($(this).is(':visible')) {
+      const id = getDetailsFromId($(this).attr('id')).id;
+      valid = validateGoogleAddress(id) && valid;
+    }
+  });
+  console.log(valid);
+  return valid;
 }
 
 function touchAllAddresses() {
@@ -522,6 +533,9 @@ $(() => {
     });
   });
 
+  // Validate All when Submit Pressed
+  $('.form-validate').click(() => validateAllInputs());
+
   // Apply Rebate Code
   $('#rebate-apply').click(() => {
     const code = $('#rebate-code').val();
@@ -565,9 +579,12 @@ $(() => {
       updateButtonRow();
       updateTextAreas();
       setAddRemoveRecipientStatus();
-      touchAllInputs();
+      validateAllInputs();
     }
     $('select[id^=quantity-]:first').trigger('change');
     $(`input[name=delivery-type][value=${deliveryType}`).click();
+    if ($('#rebate-code').val() !== '') {
+      $('#rebate-apply').trigger('click');
+    }
   }
 });

@@ -85,8 +85,6 @@ function whiskController() {
       debug(error);
     }
 
-    debug(priceInformation);
-
     // Render Page
     return res.render('treatboxconfirm', {
       googleApiKey,

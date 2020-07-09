@@ -179,7 +179,13 @@ function updatePrice() {
 }
 
 // Validate address and generate message
-function validateGoogleAddress(recipientId) {
+function validateGoogleAddress(recipientId, userOptions = {}) {
+  const options = {};
+  if (userOptions.allowBlank === false) {
+    options.allowBlank = false;
+  } else {
+    options.allowBlank = true;
+  }
   const namePostfix = getNamePostfix(recipientId);
 
   const selector = $(`#address${namePostfix}`);
@@ -190,10 +196,10 @@ function validateGoogleAddress(recipientId) {
   let valid = true;
   let message;
 
-  // if (addressToValidate === '') {
-  //   valid = null;
-  //   message = ''; } else
-  if (addressToValidate === '' || googleAddress !== addressToValidate || Number.isNaN(zone)) {
+  if (options.allowBlank && addressToValidate === '') {
+    valid = false;
+    message = '';
+  } else if (addressToValidate === '' || googleAddress !== addressToValidate || Number.isNaN(zone)) {
     message = 'Invalid Address, please select from dropdown menu';
     valid = false;
   } else if (zone === 0) {
@@ -446,16 +452,38 @@ function validateAllInputs() {
   });
   $('input[id^=address]').each(function callback() {
     if ($(this).is(':visible')) {
-      const id = getDetailsFromId($(this).attr('id')).id;
+      const { id } = getDetailsFromId($(this).attr('id'));
       valid = validateGoogleAddress(id) && valid;
     }
   });
-  console.log(valid);
   return valid;
 }
 
 function touchAllAddresses() {
   $('input[id^=address]').focusout();
+}
+
+async function lookupRebateCode(code) {
+  const data = await $.ajax({
+    method: 'get',
+    url: `${managementBaseUrl}/treatbox/lookuprebate`,
+    data: {
+      code
+    }
+  });
+  if (data.valid) {
+    switch (data.code.type) {
+      case 'zone3delivery':
+        zone3delivery = true;
+        touchAllAddresses();
+        updatePrice();
+        break;
+
+      default:
+        break;
+    }
+  }
+  return data;
 }
 
 // On DOM Loaded...
@@ -535,35 +563,19 @@ $(() => {
 
   // Validate All when Submit Pressed
   $('.form-validate').click(() => validateAllInputs());
-
   // Apply Rebate Code
   $('#rebate-apply').click(() => {
-    const code = $('#rebate-code').val();
-
-    $.ajax({
-      method: 'get',
-      url: `${managementBaseUrl}/treatbox/lookuprebate`,
-      data: {
-        code
-      }
-    }).done((data) => {
+    const code = $('#rebate-entry').val();
+    lookupRebateCode(code).then((data) => {
       if (data.valid) {
-        switch (data.code.type) {
-          case 'zone3delivery':
-            zone3delivery = true;
-            touchAllAddresses();
-            updatePrice();
-            break;
-
-          default:
-            break;
-        }
-        $('#message-rebate-code').text('Code Applied!');
+        const html = `<input type="hidden" id="rebate-codes" name="rebate-codes" value="${data.code.value}" />`;
+        $(html).insertAfter($('#rebate-entry'));
+        $('#rebate-message').text('Code Applied!');
       } else {
-        $('#message-rebate-code').text('Invalid Code');
+        $('#rebate-message').text('Invalid Code');
       }
     }).catch(() => {
-      $('#message-rebate-code').text('There was an error looking up your code');
+      $('#rebate-message').text('There was an error looking up your code');
     });
   });
 
@@ -579,12 +591,15 @@ $(() => {
       updateButtonRow();
       updateTextAreas();
       setAddRemoveRecipientStatus();
-      validateAllInputs();
     }
     $('select[id^=quantity-]:first').trigger('change');
     $(`input[name=delivery-type][value=${deliveryType}`).click();
-    if ($('#rebate-code').val() !== '') {
-      $('#rebate-apply').trigger('click');
+    if ($('#rebate-codes').val() !== '') {
+      const codes = $('#rebate-codes').val().split(',');
+      codes.forEach((code) => {
+        lookupRebateCode(code);
+      });
     }
+    validateAllInputs();
   }
 });

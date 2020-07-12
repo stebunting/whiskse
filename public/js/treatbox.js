@@ -153,13 +153,20 @@ function updatePrice() {
     zone2: zone2Deliveries,
     zone3: zone3Deliveries
   });
+  let codes = $('#rebate-codes').val();
+  if (codes != null) {
+    codes = codes.split(',');
+  } else {
+    codes = [];
+  }
 
   $.ajax({
     method: 'post',
     url: `${managementBaseUrl}/treatbox/lookupprice`,
     data: {
       basket: JSON.stringify(basket),
-      delivery
+      delivery,
+      codes
     }
   }).then((data) => {
     if (data.status === 'OK') {
@@ -476,6 +483,10 @@ async function lookupRebateCode(code) {
       case 'zone3delivery':
         zone3delivery = true;
         touchAllAddresses();
+        updatePrice();
+        break;
+
+      case 'costprice':
         updatePrice();
         break;
 

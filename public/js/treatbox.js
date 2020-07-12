@@ -593,12 +593,15 @@ $(() => {
       setAddRemoveRecipientStatus();
     }
     $('select[id^=quantity-]:first').trigger('change');
-    $(`input[name=delivery-type][value=${deliveryType}`).click();
+    $(`input[name=delivery-type][value=${deliveryType}]`).click();
     if ($('#rebate-codes').val() !== '') {
-      const codes = $('#rebate-codes').val().split(',');
-      codes.forEach((code) => {
-        lookupRebateCode(code);
-      });
+      const codes = $('#rebate-codes').val();
+      if (codes != null) {
+        const codeArray = codes.split(',');
+        codeArray.forEach((code) => {
+          lookupRebateCode(code);
+        });
+      }
     }
     validateAllInputs();
   }

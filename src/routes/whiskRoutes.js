@@ -47,6 +47,9 @@ function routes() {
   whiskRoutes.route('/faq')
     .get((req, res) => res.render('faq', { googleApiKey, page: 'faq' }));
 
+  whiskRoutes.route('/store')
+    .get((req, res) => res.redirect('https://store.whisk.se'));
+
   whiskRoutes.route('/management')
     .get((req, res) => res.redirect('https://whisk-management.herokuapp.com'));
 

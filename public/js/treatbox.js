@@ -1,4 +1,4 @@
-/* global google, validateInput, printMessage, post, deliveryType */
+/* global google, validateInput, printMessage */
 // Requirements
 import {
   initialise,
@@ -595,8 +595,8 @@ $(() => {
   $('#date-selector, #product-selector, #submit-fieldset').show(animationTime);
 
   // Check if form is posted
-  if (post) {
-    if (deliveryType === 'split-delivery') {
+  if (window.post) {
+    if (window.deliveryType === 'split-delivery') {
       items = JSON.parse($('#items').val());
       recipients = JSON.parse($('#recipients').val());
       updateButtonRow();
@@ -604,7 +604,7 @@ $(() => {
       setAddRemoveRecipientStatus();
     }
     $('select[id^=quantity-]:first').trigger('change');
-    $(`input[name=delivery-type][value=${deliveryType}]`).click();
+    $(`input[name=delivery-type][value=${window.deliveryType}]`).click();
     if ($('#rebate-codes').val() !== '') {
       const codes = $('#rebate-codes').val();
       if (codes != null) {

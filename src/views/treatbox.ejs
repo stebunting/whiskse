@@ -4,10 +4,10 @@
   headerDisplay: false
 }); %>
   <script>
-    const post = <%
+    window.post = <%
     if (Object.keys(body).length > 0) {
       %>true;
-    const deliveryType = '<%=body['delivery-type'] %>';<%
+    window.deliveryType = '<%=body['delivery-type'] %>';<%
     } else { %>false;<%
     } %>
   </script>

@@ -527,26 +527,29 @@ $(() => {
 
   // Delivery Type
   $('#delivery').click(() => {
+    const collectionHidden = $('#user-collection').hide(animationTime);
     const recipientsHidden = $('fieldset[id^=recipient').hide(animationTime);
     const deliveryShown = $('#user-delivery').show(animationTime);
     $('#address, #notes-address').prop('disabled', false);
-    $.when(deliveryShown, recipientsHidden).done(() => {
+    $.when(collectionHidden, deliveryShown, recipientsHidden).done(() => {
       updatePrice();
     });
   });
 
   $('#collection').click(() => {
+    const collectionShown = $('#user-collection').show(animationTime);
     const deliveryHidden = $('#user-delivery').hide(animationTime);
     const recipientsHidden = $('fieldset[id^=recipient').hide(animationTime);
-    $.when(deliveryHidden, recipientsHidden).done(() => {
+    $.when(collectionShown, deliveryHidden, recipientsHidden).done(() => {
       updatePrice();
     });
   });
 
   $('#split-delivery').click(() => {
+    const collectionHidden = $('#user-collection').hide(animationTime);
     const deliveryHidden = $('#user-delivery').hide(animationTime);
     const recipientsShown = $('fieldset[id^=recipient').show(animationTime);
-    $.when(deliveryHidden, recipientsShown).done(() => {
+    $.when(collectionHidden, deliveryHidden, recipientsShown).done(() => {
       updatePrice();
     });
     if (recipients.length === 0) {

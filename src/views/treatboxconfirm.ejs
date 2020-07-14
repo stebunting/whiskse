@@ -135,6 +135,12 @@ switch (body['delivery-type']) {
       <th class="table-label" scope="row">Delivery</th>
       <td><%=delivery %></td>
     </tr>
+<% if (delivery === "Collection from Whisk") { %>
+    <tr>
+      <th class="table-label" scope="row">Notes</th>
+      <td><%=body['collection-notes'] %></td>
+    </tr><% }
+  %>
 <% if (delivery === "Home Delivery") { %>
     <tr>
       <th class="table-label" scope="row">Address</th>

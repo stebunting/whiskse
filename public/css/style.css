@@ -551,7 +551,7 @@ label {
   text-align: right;
 }
 
-#user-delivery {
+#user-collection, #user-delivery {
   display: none;
 }
 

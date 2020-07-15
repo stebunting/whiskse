@@ -20,6 +20,7 @@ let zone3delivery = false;
 let basket = [];
 let items = [];
 let recipients = [];
+let codes = new Set();
 
 // Show Purchaser/Delivery Details if hidden
 function showPurchaserDetails() {
@@ -153,20 +154,14 @@ function updatePrice() {
     zone2: zone2Deliveries,
     zone3: zone3Deliveries
   });
-  let codes = $('#rebate-codes').val();
-  if (codes != null) {
-    codes = codes.split(',');
-  } else {
-    codes = [];
-  }
-
+  
   $.ajax({
     method: 'post',
     url: `${managementBaseUrl}/treatbox/lookupprice`,
     data: {
       basket: JSON.stringify(basket),
       delivery,
-      codes
+      codes: JSON.stringify(Array.from(codes))
     }
   }).then((data) => {
     if (data.status === 'OK') {
@@ -483,7 +478,6 @@ async function lookupRebateCode(code) {
       case 'zone3delivery':
         zone3delivery = true;
         touchAllAddresses();
-        updatePrice();
         break;
 
       case 'costprice':
@@ -582,9 +576,10 @@ $(() => {
     const code = $('#rebate-entry').val();
     lookupRebateCode(code).then((data) => {
       if (data.valid) {
-        const html = `<input type="hidden" id="rebate-codes" name="rebate-codes" value="${data.code.value}" />`;
-        $(html).insertAfter($('#rebate-entry'));
+        codes.add(data.code.value);
+        $('#rebate-codes').val(JSON.stringify(Array.from(codes)));
         $('#rebate-message').text('Code Applied!');
+        updatePrice();  
       } else {
         $('#rebate-message').text('Invalid Code');
       }
@@ -609,13 +604,12 @@ $(() => {
     $('select[id^=quantity-]:first').trigger('change');
     $(`input[name=delivery-type][value=${window.deliveryType}]`).click();
     if ($('#rebate-codes').val() !== '') {
-      const codes = $('#rebate-codes').val();
-      if (codes != null) {
-        const codeArray = codes.split(',');
-        codeArray.forEach((code) => {
-          lookupRebateCode(code);
-        });
-      }
+      const codesToApply = JSON.parse($('#rebate-codes').val());
+      codesToApply.forEach((code) => {
+        codes.add(code);
+        lookupRebateCode(code);
+      });
+      updatePrice();
     }
     validateAllInputs();
   }

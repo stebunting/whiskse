@@ -240,11 +240,10 @@
       <div class="form-group row" id="rebate-entry-div">
         <label for="rebate-entry" class="col-sm-4 col-form-label">Rebate Code</label>
         <div class="col-sm-4">
-          <input type="text" class="form-control" id="rebate-entry" name="rebate-entry" placeholder="Rebate Code"><%
-            if (body['rebate-codes']) { %>
-          <input type="hidden" id="rebate-codes" name="rebate-codes" value="<%=body['rebate-codes'] %>" /><%
-            }
-          %>
+          <input type="text" class="form-control" id="rebate-entry" name="rebate-entry" placeholder="Rebate Code">
+          <input type="hidden" id="rebate-codes" name="rebate-codes" value="<%
+            if (body['rebate-codes']) { %><%=body['rebate-codes'] %><%
+            } %>" />
           <div id="rebate-message"></div>
         </div>
         <div class="col-sm-2">

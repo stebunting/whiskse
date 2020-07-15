@@ -74,7 +74,8 @@ function whiskController() {
       url: `${managementBaseUrl}/treatbox/lookupprice`,
       data: {
         basket,
-        delivery
+        delivery,
+        codes: req.body['rebate-codes']
       }
     };
     let priceInformation;

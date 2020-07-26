@@ -87,7 +87,6 @@ function priceFormat(num, userOptions = {}) {
     minimumFractionDigits: options.includeOre ? 2 : 0,
     maximumFractionDigits: options.includeOre ? 2 : 0
   });
-  str = str.replace(',', '');
   str += options.includeSymbol ? ' SEK' : '';
   return str;
 }

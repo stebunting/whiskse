@@ -86,6 +86,12 @@ function whiskController() {
       debug(error);
     }
 
+    let payload = {};
+    Object.entries(req.body).forEach((item) => {
+      const [key, value] = item;
+      payload[key] = value;
+    });
+
     // Render Page
     return res.render('treatboxconfirm', {
       googleApiKey,
@@ -98,7 +104,8 @@ function whiskController() {
       priceInformation,
       priceFormat,
       dateFormat,
-      parseDateCode
+      parseDateCode,
+      payload
     });
   }
 

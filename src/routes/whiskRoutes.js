@@ -29,10 +29,10 @@ function routes() {
     .post(treatboxConfirmation);
 
   whiskRoutes.route('/orderplaced')
-    .get((req, res) => res.render('orderplaced', {
+    .post((req, res) => res.render('orderplaced', {
       googleApiKey,
-      page: 'menu',
-      query: req.query
+      page: 'orderplaced',
+      body: req.body
     }));
 
   whiskRoutes.route('/menu')

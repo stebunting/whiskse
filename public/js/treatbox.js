@@ -10,8 +10,8 @@ import {
 initialise();
 
 // Constants
-const managementBaseUrl = 'https://5463a9270d6b.ngrok.io'; //'http://localhost:5000';
-// const managementBaseUrl = 'https://whisk-management.herokuapp.com';
+// const managementBaseUrl = 'http://localhost:5000';
+const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const animationTime = 400;
 
 // User Choices
@@ -153,7 +153,7 @@ function updatePrice() {
     zone2: zone2Deliveries,
     zone3: zone3Deliveries
   });
-  
+
   $.ajax({
     method: 'post',
     url: `${managementBaseUrl}/treatbox/lookupprice`,
@@ -578,7 +578,7 @@ $(() => {
         codes.add(data.code.value);
         $('#rebate-codes').val(JSON.stringify(Array.from(codes)));
         $('#rebate-message').text('Code Applied!');
-        updatePrice();  
+        updatePrice();
       } else {
         $('#rebate-message').text('Invalid Code');
       }

@@ -1,10 +1,7 @@
 /* global google, validateInput, printMessage */
 // Requirements
 import {
-  initialise,
-  isLocal,
-  inZoneOne,
-  inZoneTwo
+  initialise, isLocal, inZoneOne, inZoneTwo
 } from './boundaries.js';
 
 initialise();
@@ -20,7 +17,7 @@ let zone3delivery = false;
 let basket = [];
 let items = [];
 let recipients = [];
-let codes = new Set();
+const codes = new Set();
 
 // Show Purchaser/Delivery Details if hidden
 function showPurchaserDetails() {

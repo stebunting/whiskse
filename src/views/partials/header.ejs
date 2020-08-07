@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<head>
+<head><%
+  if (typeof googleDataLayer !== 'undefined') { %>
+  <script>
+    const dataLayer = [(<%-googleDataLayer %>)];
+  </script>
+  <% } %>
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-146052391-1"></script>
   <script>
@@ -10,8 +15,22 @@
       dataLayer.push(arguments);
     }
     gtag('js', new Date());
-
     gtag('config', 'UA-146052391-1');
+
+    // Google Tag Manager
+    (function(w, d, s, l, i) {
+      w[l] = w[l] || [];
+      w[l].push({
+        'gtm.start': new Date().getTime(),
+        event:'gtm.js'
+      });
+      const f = d.getElementsByTagName(s)[0];
+      const j = d.createElement(s);
+      const dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true;
+      j.src = `https://www.googletagmanager.com/gtm.js?id=${i}${dl}`;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-N8LRXL9');
   </script>
   
   <!-- Required meta tags -->
@@ -42,6 +61,12 @@
 </head>
 
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+  <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N8LRXL9" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 <!-- https://www.codeply.com/go/kTGlK9Axdk bootstrap-4-navbar-center-links-examples -->
 <nav class="navbar fixed-top navbar-expand-md navbar-light bg-white justify-content-between">
   <div class="container-fluid">

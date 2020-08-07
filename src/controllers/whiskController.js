@@ -11,6 +11,32 @@ const managementBaseUrl = process.env.MANAGEMENT_BASE_URL;
 const googleApiKey = process.env.GOOGLE_API_KEY;
 
 function whiskController() {
+  function generateDataLayer(statement, event) {
+    const { products } = statement;
+    const dataLayer = {
+      ecommerce: {
+        items: []
+      }
+    };
+    products.forEach((product) => {
+      dataLayer.ecommerce.items.push({
+        item_name: product.name,
+        item_id: product.id,
+        price: product.price / 100,
+        quantity: product.quantity
+      });
+    });
+    switch (event) {
+      case 'checkout':
+        dataLayer.event = 'begin_checkout';
+        break;
+
+      default:
+        break;
+    }
+    return JSON.stringify(dataLayer);
+  }
+
   async function treatboxOrderForm(req, res) {
     // Get URLs
     const confirmationUrl = new URL(`${req.protocol}://${req.get('host')}/treatboxconfirm`);
@@ -45,7 +71,8 @@ function whiskController() {
     // Get Price Information
     let basket = [];
     const orders = Object.entries(req.body).filter((x) => x[0].startsWith('quantity-'));
-    for (const [key, q] of orders) {
+    for (let i = 0; i < orders.length; i += 1) {
+      const [key, q] = orders[i];
       const [, id] = key.split('-');
       const quantity = parseInt(q, 10);
       if (quantity > 0) {
@@ -58,8 +85,8 @@ function whiskController() {
     let zone2Deliveries;
     let zone3Deliveries;
     if (req.body['delivery-type'] === 'delivery') {
-      zone2Deliveries = req.body['zone'] === '2' ? 1 : 0;
-      zone3Deliveries = req.body['zone'] === '3' ? 1 : 0;
+      zone2Deliveries = req.body.zone === '2' ? 1 : 0;
+      zone3Deliveries = req.body.zone === '3' ? 1 : 0;
     } else if (req.body['delivery-type'] === 'split-delivery') {
       zone2Deliveries = Object.entries(req.body).filter((x) => x[0].startsWith('zone-') && x[1] === '2').length;
       zone3Deliveries = Object.entries(req.body).filter((x) => x[0].startsWith('zone-') && x[1] === '3').length;
@@ -86,7 +113,9 @@ function whiskController() {
       debug(error);
     }
 
-    let payload = {};
+    const googleDataLayer = generateDataLayer(priceInformation, 'checkout');
+
+    const payload = {};
     Object.entries(req.body).forEach((item) => {
       const [key, value] = item;
       payload[key] = value;
@@ -105,11 +134,20 @@ function whiskController() {
       priceFormat,
       dateFormat,
       parseDateCode,
-      payload
+      payload,
+      googleDataLayer
     });
   }
 
-  return { treatboxOrderForm, treatboxConfirmation };
+  async function orderPlaced(req, res) {
+    return res.render('orderplaced', {
+      googleApiKey,
+      page: 'orderplaced',
+      body: req.body
+    });
+  }
+
+  return { treatboxOrderForm, treatboxConfirmation, orderPlaced };
 }
 
 module.exports = whiskController;

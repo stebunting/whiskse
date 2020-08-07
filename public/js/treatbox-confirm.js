@@ -135,6 +135,9 @@ $(() => {
         updateErrors(data.errors);
         setOrderInProgress(false, method);
       } else if (data.status === 'OK') {
+        $('#transaction-id').val(data.id);
+        $('#submitform').submit();
+
         // Invoice
         if (data.method === 'Invoice') {
           $('#submitform').submit();

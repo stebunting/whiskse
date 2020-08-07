@@ -176,6 +176,7 @@ switch (body['delivery-type']) {
       }
     }
     %>
+    <input type="hidden" id="transaction-id" name="transaction-id" value="" />
 
     <button class="btn btn-primary" type="submit" formaction="<%=amendUrl %>" value="amend">Amend</button>
     <button class="btn btn-success" type="submit" id="submitorder" value="submit">Order and Pay</button>

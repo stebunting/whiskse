@@ -58,22 +58,37 @@ function whiskController() {
   }
 
   // Function to generate a dataLayer object for GTM tracking
-  function generateDataLayer(statement, event) {
+  function generateDataLayer(statement, event, id) {
     const { products } = statement;
     const dataLayer = {
       event,
       ecommerce: {
-        items: []
+        currencyCode: 'SEK',
+        [event]: {
+          products: []
+        }
       }
     };
     products.forEach((product) => {
-      dataLayer.ecommerce.items.push({
-        item_name: product.name,
-        item_id: product.id,
+      dataLayer.ecommerce[event].products.push({
+        name: product.name,
+        id: product.id,
         price: product.price / 100,
         quantity: product.quantity
       });
     });
+    if (event === 'purchase') {
+      dataLayer.ecommerce.purchase.actionField = {
+        id,
+        revenue: statement.bottomLine.total / 100,
+        tax: statement.bottomLine.totalMoms / 100,
+        shipping: statement.bottomLine.deliveryCost / 100
+      };
+    } else if (event === 'checkout') {
+      dataLayer.ecommerce.checkout.actionField = {
+        step: 1
+      };
+    }
     return JSON.stringify(dataLayer);
   }
 
@@ -112,7 +127,7 @@ function whiskController() {
     const statement = await getStatement(req.body);
 
     // Get Data Layer for GTM Tracking
-    const googleDataLayer = generateDataLayer(statement, 'begin_checkout');
+    const googleDataLayer = generateDataLayer(statement, 'checkout');
 
     const payload = {};
     Object.entries(req.body).forEach((item) => {
@@ -141,7 +156,7 @@ function whiskController() {
   async function orderPlaced(req, res) {
     // Get Data Layer for GTM Tracking
     const statement = await getStatement(req.body);
-    const googleDataLayer = generateDataLayer(statement, 'purchase');
+    const googleDataLayer = generateDataLayer(statement, 'purchase', req.body['transaction-id']);
 
     return res.render('orderplaced', {
       googleApiKey,

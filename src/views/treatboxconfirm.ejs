@@ -115,8 +115,8 @@ switch (body['delivery-type']) {
       <th class="order-price column">Price</th>
       <th class="order-subtotal column">Sub-Total</th>
     </tr>
-    <% for (let i = 0; i < priceInformation.products.length; i += 1) {
-        const product = priceInformation.products[i]; %>
+    <% for (let i = 0; i < statement.products.length; i += 1) {
+        const product = statement.products[i]; %>
     <tr>
       <td class="order-item"><%=product.name %></td>
       <td id="combobox-quantity" class="order-quantity"><%=product.quantity %></td>
@@ -126,19 +126,19 @@ switch (body['delivery-type']) {
     <% } %>
     <tr>
       <th class="order-total" colspan="3" scope="row">Food Cost</th>
-      <td id="food-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.foodCost) %></td>
+      <td id="food-total" class="order-subtotal"><%=priceFormat(statement.bottomLine.foodCost) %></td>
     </tr>
     <tr>
       <th class="order-total" colspan="3" scope="row">Delivery Cost</th>
-      <td id="delivery-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.deliveryCost) %></td>
+      <td id="delivery-total" class="order-subtotal"><%=priceFormat(statement.bottomLine.deliveryCost) %></td>
     </tr>
     <tr>
       <th class="order-total" colspan="3" scope="row">MOMs</th>
-      <td id="moms-total" class="order-subtotal"><%=priceFormat(priceInformation.bottomLine.totalMoms, { includeOre: true }) %></td>
+      <td id="moms-total" class="order-subtotal"><%=priceFormat(statement.bottomLine.totalMoms, { includeOre: true }) %></td>
     </tr>
     <tr>
       <th class="order-total" colspan="3" scope="row">Total Cost</th>
-      <th id="total-to-pay" class="order-subtotal" scope="row"><%=priceFormat(priceInformation.bottomLine.total) %></th>
+      <th id="total-to-pay" class="order-subtotal" scope="row"><%=priceFormat(statement.bottomLine.total) %></th>
     </tr>
   </table>
 

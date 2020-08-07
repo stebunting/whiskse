@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 
 <html lang="en">
-<head>
-  <!-- Google Tag Manager -->
-  <script src="/js/gtm.js"></script><%
+<head><%
   if (typeof googleDataLayer !== 'undefined') { %>
   <script>
-    dataLayer.push(<%-googleDataLayer %>);
+    dataLayer = [<%-googleDataLayer %>];
   </script><% } %>
+  <!-- Google Tag Manager -->
+  <script src="/js/gtm.js"></script>
   
   <!-- Required meta tags -->
   <meta charset="utf-8">

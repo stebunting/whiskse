@@ -16,10 +16,6 @@ function routes() {
   whiskRoutes.route('/')
     .get((req, res) => res.render('index', { googleApiKey, page: 'index' }));
 
-  // Legacy Redirects
-  whiskRoutes.route(['/treatbox', '/treatboxes.php'])
-    .get((req, res) => res.redirect('/treatboxorder'))
-
   whiskRoutes.route('/treatboxorder')
     .get(treatboxOrderForm)
     .post(treatboxOrderForm);
@@ -43,11 +39,19 @@ function routes() {
   whiskRoutes.route('/faq')
     .get((req, res) => res.render('faq', { googleApiKey, page: 'faq' }));
 
+  whiskRoutes.route('/sitemap')
+    .get((req, res) => res.render('sitemap'));
+
+  // Redirects
   whiskRoutes.route('/store')
     .get((req, res) => res.redirect('https://store.whisk.se'));
 
   whiskRoutes.route('/management')
     .get((req, res) => res.redirect('https://whisk-management.herokuapp.com'));
+
+  // Legacy Redirects
+  whiskRoutes.route(['/treatbox', '/treatboxes.php'])
+    .get((req, res) => res.redirect('/treatboxorder'));
 
   return whiskRoutes;
 }

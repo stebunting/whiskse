@@ -56,8 +56,10 @@
       <div class="form-group row">
         <div class="col-sm-10 offset-md-1 form-group">
           <select class="form-control form-control-sm" id="date" name="date"><%
-            for (const [code, date] of Object.entries(apiResponse.timeframe)) { %>
+            for (const [code, date] of Object.entries(apiResponse.timeframe)) {
+              if (date.orderable) { %>
             <option value="<%=code %>"><%=dateFormat(date.delivery) %></option><%
+              }
             } %>
           </select>
         </div>

@@ -10,6 +10,7 @@
     window.deliveryType = '<%=body['delivery-type'] %>';<%
     } else { %>false;<%
     } %>
+    window.orderable = <%-orderable %>;
   </script>
 
   <h2 class="treatbox-form-header">Your Weekly Wednesday Delivery of Sweet Treats and Lilla Laback Organic Vegetables</h2>
@@ -57,8 +58,11 @@
         <div class="col-sm-10 offset-md-1 form-group">
           <select class="form-control form-control-sm" id="date" name="date"><%
             for (const [code, date] of Object.entries(apiResponse.timeframe)) {
-              if (date.orderable) { %>
-            <option value="<%=code %>"><%=dateFormat(date.delivery) %></option><%
+              if (date.deadline.normal.notPassed) { %>
+            <option value="<%=code %>" <%
+                if (body.date === code) {
+              %> selected<%
+                } %>><%=dateFormat(date.delivery) %></option><%
               }
             } %>
           </select>
@@ -121,11 +125,11 @@
             <label class="form-check-label" for="collection">Collection from Whisk</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="radio" id="delivery" name="delivery-type" value="delivery" disabled="true" />
+            <input class="form-check-input" type="radio" id="delivery" name="delivery-type" value="delivery" disabled />
             <label class="form-check-label" for="delivery">Delivery</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="radio" id="split-delivery" name="delivery-type" value="split-delivery" disabled="true">
+            <input class="form-check-input" type="radio" id="split-delivery" name="delivery-type" value="split-delivery" disabled>
             <label class="form-check-label" for="split-delivery">Delivery to another person / multiple people</label>
           </div>
           <button type="button" class="btn icon-button btn-sm" data-toggle="modal" data-target="#deliveryZoneModal"><img class="delivery-icon" src="/icons/zone-map.png" alt="Delivery Zones" /> Delivery Zones</button>
@@ -136,7 +140,7 @@
         <div class="form-group row">
           <label for="collection-notes" class="col-sm-4 col-form-label">Notes</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" id="collection-notes" name="collection-notes" autocomplete="chrome-off" placeholder="Notes" value="<% if (body['collection-notes']) { %><%=body['collection-notes'] %><% } %>">
+            <input type="text" class="form-control" id="collection-notes" name="collection-notes" autocomplete="off" placeholder="Notes" value="<% if (body['collection-notes']) { %><%=body['collection-notes'] %><% } %>">
           </div>
         </div>
       </div>
@@ -145,7 +149,7 @@
         <div class="form-group row">
           <label for="address" class="col-sm-4 col-form-label">Address</label>
           <div class="col-sm-6">
-            <input type="text" class="form-control" id="address" name="address" autocomplete="chrome-off" placeholder="Address" value="<% if (body.address) { %><%=body.address %><% } %>">
+            <input type="text" class="form-control" id="address" name="address" autocomplete="off" placeholder="Address" value="<% if (body.address) { %><%=body.address %><% } %>">
             <input type="hidden" id="zone" name="zone" value="<% if (body.zone) { %><%=body.zone %><% } else { %>0<% } %>">
             <input type="hidden" id="google-formatted-address" name="google-formatted-address" value="<% if (body['google-formatted-address']) { %><%=body['google-formatted-address'] %><% } %>">
             <div id="message-address"></div>

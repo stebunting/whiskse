@@ -119,9 +119,9 @@ switch (body['delivery-type']) {
         const product = statement.products[i]; %>
     <tr>
       <td class="order-item"><%=product.name %></td>
-      <td id="combobox-quantity" class="order-quantity"><%=product.quantity %></td>
-      <td id="combobox-price" class="order-price"><%=priceFormat(product.price) %></td>
-      <td id="combobox-subtotal" class="order-subtotal"><%=priceFormat(product.subTotal) %></td>
+      <td class="order-quantity"><%=product.quantity %></td>
+      <td class="order-price"><%=priceFormat(product.price) %></td>
+      <td class="order-subtotal"><%=priceFormat(product.subTotal) %></td>
     </tr>
     <% } %>
     <tr>
@@ -160,7 +160,7 @@ switch (body['delivery-type']) {
   <form method="post" action="orderplaced" id="submitform">
 
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="payment-method" id="swish" value="Swish" checked="true">
+      <input class="form-check-input" type="radio" name="payment-method" id="swish" value="Swish" checked>
       <label class="form-check-label" for="swish">Swish</label>
     </div>
     <div class="form-check">

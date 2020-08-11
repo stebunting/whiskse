@@ -5,6 +5,7 @@ const tag = 'whiskse:whiskController';
 const axios = require('axios');
 const debug = require('debug')(tag);
 const { priceFormat, dateFormat, parseDateCode } = require('../functions/helper');
+const { normalizeUnits } = require('moment');
 
 // Constants
 const managementBaseUrl = process.env.MANAGEMENT_BASE_URL;
@@ -104,6 +105,18 @@ function whiskController() {
       debug(error);
     }
 
+    const orderable = {};
+    Object.entries(apiResponse.timeframe).forEach((timeframe) => {
+      const products = {};
+      apiResponse.products.forEach((product) => {
+        const deadlineType = product.deadline;
+        products[product._id] = timeframe[1].deadline[deadlineType].notPassed;
+      });
+      orderable[timeframe[0]] = {
+        products
+      };
+    });
+
     // Render Page
     return res.render('treatbox', {
       googleApiKey,
@@ -113,7 +126,8 @@ function whiskController() {
       body: req.body,
       apiResponse,
       priceFormat,
-      dateFormat
+      dateFormat,
+      orderable: JSON.stringify(orderable)
     });
   }
 

@@ -19,6 +19,9 @@ let items = [];
 let recipients = [];
 const codes = new Set();
 
+// Details
+let array;
+
 // Show Purchaser/Delivery Details if hidden
 function showPurchaserDetails() {
   if (!$('#purchaser-details').is(':visible')) {
@@ -487,8 +490,22 @@ async function lookupRebateCode(code) {
   return data;
 }
 
+function updateProductAvailability() {
+  const selectedDate = $('#date').val();
+  Object.entries(array[selectedDate].products).forEach((product) => {
+    if (!product[1]) {
+      $(`#quantity-${product[0]}`).val(0).trigger('change').prop('disabled', true);
+    } else {
+      $(`#quantity-${product[0]}`).prop('disabled', false);
+    }
+  });
+}
+
 // On DOM Loaded...
 $(() => {
+  // Get orderable array from DOM
+  array = window.orderable;
+
   // Select Items
   $('select[id^=quantity-]').change(() => {
     updateItems();
@@ -497,6 +514,9 @@ $(() => {
     showPurchaserDetails();
     updatePrice();
   });
+
+  // Update product availability when date changed
+  $('#date').change(updateProductAvailability);
 
   // Validate User Details as they are entered
   $('input[id^=name]').focusout(function callback() {
@@ -567,6 +587,7 @@ $(() => {
 
   // Validate All when Submit Pressed
   $('.form-validate').click(() => validateAllInputs());
+
   // Apply Rebate Code
   $('#rebate-apply').click(() => {
     const code = $('#rebate-entry').val();
@@ -585,6 +606,7 @@ $(() => {
   });
 
   // Hide Loading Spinner and Show Page
+  $('#date').trigger('change');
   $('#loading-div').hide(animationTime);
   $('#date-selector, #product-selector, #submit-fieldset').show(animationTime);
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Whisk.se Tests</title>
+
+    <link href="/test/mocha.css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="mocha"></div>
+
+    <!-- Import Testing Frameworks -->
+    <script src="/test/chai.js"></script>
+    <script src="/test/mocha.js"></script>
+    <script class="mocha-init">
+      mocha.setup('bdd');
+      const assert = chai.assert;
+    </script>
+
+    <!-- Import Testing Requirements -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&libraries=places,geometry"></script>
+    <script src="/js/boundaries.js"></script>
+    <script src="/js/treatbox.js"></script>
+
+    <!-- Import Testing Files -->
+    <script src="/test/boundary-tests.js"></script>
+    <script src="/test/treatbox-tests.js"></script>
+
+    <script class="mocha-exec">
+      mocha.run();
+    </script>
+  </body>
+</html>

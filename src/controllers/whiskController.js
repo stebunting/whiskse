@@ -26,19 +26,19 @@ function whiskController() {
     basket = JSON.stringify(basket);
 
     // Get Delivery Information
-    let zone2Deliveries;
-    let zone3Deliveries;
+    let delivery = [0, 0, 0, 0];
     if (postData['delivery-type'] === 'delivery') {
-      zone2Deliveries = postData.zone === '2' ? 1 : 0;
-      zone3Deliveries = postData.zone === '3' ? 1 : 0;
+      const zone = parseInt(postData.zone, 10);
+      delivery[zone] += 1;
     } else if (postData['delivery-type'] === 'split-delivery') {
-      zone2Deliveries = Object.entries(postData).filter((x) => x[0].startsWith('zone-') && x[1] === '2').length;
-      zone3Deliveries = Object.entries(postData).filter((x) => x[0].startsWith('zone-') && x[1] === '3').length;
+      Object.entries(postData).forEach((entry) => {
+        if (entry[0].startsWith('zone-')) {
+          const zone = parseInt(entry[1], 10);
+          delivery[zone] += 1;
+        }
+      });
     }
-    const delivery = JSON.stringify({
-      zone2: zone2Deliveries,
-      zone3: zone3Deliveries
-    });
+    delivery = JSON.stringify(delivery);
 
     const axiosConfig = {
       method: 'post',

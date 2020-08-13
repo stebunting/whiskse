@@ -91,12 +91,8 @@ function updatePrice() {
     }
   });
 
-  let delivery = {
-    zone0: 0,
-    zone1: 0,
-    zone2: 0,
-    zone3: 0
-  };
+  // Array to hold number of deliveries in zones 0-3
+  let delivery = [0, 0, 0, 0];
   if (!$('#collection').is(':checked')) {
     $('input[id^=zone]').each(function callback() {
       const postfix = getDetailsFromId($(this).attr('id'));
@@ -105,25 +101,9 @@ function updatePrice() {
         inputIdSelector = $(`#address-${postfix.id}`);
       }
       if (inputIdSelector.is(':visible')) {
-        switch ($(this).val()) {
-          case '0':
-            delivery.zone0 += 1;
-            break;
-
-          case '1':
-            delivery.zone1 += 1;
-            break;
-
-          case '2':
-            delivery.zone2 += 1;
-            break;
-
-          case '3':
-            delivery.zone3 += 1;
-            break;
-
-          default:
-            break;
+        const zone = parseInt($(this).val(), 10);
+        if (zone >= 0 && zone <= 3) {
+          delivery[zone] += 1;
         }
       }
     });
@@ -145,9 +125,9 @@ function updatePrice() {
       $('#delivery-cost').text(priceFormat(data.bottomLine.deliveryCost));
       $('#delivery-moms').text(priceFormat(data.bottomLine.deliveryMoms, { includeOre: true }));
       $('#total-cost').text(priceFormat(data.bottomLine.total));
-      Object.keys(data.delivery).forEach((zone) => {
-        const price = data.delivery[zone].price !== 0 ? priceFormat(data.delivery[zone].price) : 'Free';
-        $(`.${zone}-surcharge-amount`).text(price);
+      data.delivery.forEach((zone) => {
+        const price = zone.price !== 0 ? priceFormat(zone.price) : 'Free';
+        $(`.zone${zone.zone}-surcharge-amount`).text(price);
       });
     }
   });

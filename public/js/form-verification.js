@@ -5,7 +5,7 @@
 // Submit button must have class form-validate
 
 // Clear messages and print current message
-function printMessage(selector, valid) {
+function setValid(selector, valid) {
   const id = selector.attr('id');
 
   if (valid === null) {
@@ -108,6 +108,6 @@ function validateInput(selector) {
     valid = false;
   }
 
-  printMessage(selector, valid);
+  setValid(selector, valid);
   return valid;
 }

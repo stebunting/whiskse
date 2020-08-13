@@ -550,7 +550,7 @@ label {
   text-align: right;
 }
 
-#user-collection, #user-delivery {
+#user-delivery {
   display: none;
 }
 

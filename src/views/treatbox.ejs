@@ -17,18 +17,18 @@
 
   <h3 class="treatbox-info">THE BOXES</h3>
   <ul>
-    <li>Treat Box is 250kr // contains 4 strawberry cupcakes and 4 oat biscuits</li>
-    <li>Veggie Box is 250kr // contains a mixture of fresh organic vegetables, edible flowers and herbs all picked at local farm <a href="http://www.lillalaback.se/" target="_blank" rel="external">Lilla Labäck</a> who supplies the best restaurants in the city</li>
+    <li>Treat Box is 250kr // contains 4 chocolate & salted caramel cupcakes and 4 oat biscuits</li>
+    <li>Veggie Box is 250kr // contains a mixture of fresh organic vegetables, edible flowers and herbs all picked at local farm <a href="http://www.lillalaback.se/" target="_blank" rel="external">Lilla Labäck</a> who supplies the best restaurants in the city and not usually available to the general public.</li>
     <li>Combo Box is 490kr // contains all the delicious things in both the Treat Box and the Veggie box</li>
   </ul>
 
   <h3 class="treatbox-info">ORDER DEADLINES</h3>
-  <p>Veggie Box and Combo Box-  9am Saturday // Treat Box - 10am Tuesday</p>
+  <p>Veggie Box & Combo Box - 9am Saturday // Treat Box - 10am Tuesday</p>
 
   <h3 class="treatbox-info">PICK UP AND DELIVERY</h3>
   <p>
-    Delivery is only available for Treat Boxes and Combo boxes. Veggie Boxes can be picked up at our store at Vikingagatan 18 between 10:30-11:30 on Wednesday.<br />
-    Delivery for Zone 1 is free. There is an additional 50kr charge to cover delivery to Zone 2<br />
+    Delivery is only available for Treat Boxes and Combo boxes (except for specific locations). Veggie Boxes can be picked up at our store at Vikingagatan 18 between 10:30-11:30 on Wednesdays.<br />
+    Delivery for Zone 1 is free. There is an additional 50kr charge to cover delivery to Zone 2.<br />
     (Please see the map to see which zone the delivery falls under)
   </p>
   <div>
@@ -77,13 +77,12 @@
       <div class="form-group row">
         <label class="col-sm-4" for="quantity-<%=product._id %>"><%=product.name %></label>
         <div class="col-sm-2 form-group">
-          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-deliverable="<%=product.deliverable %>"><%
+          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-deliverable="<%=product.deliverable %>" data-name="<%=product.name %>" data-deliverable-zone="<%=product.deliverableZone %>"><%
             for (let i = 0; i < 10; i += 1) { %>
             <option value="<%=i %>"<% 
               if (body[`quantity-${product._id}`] && parseInt(body[`quantity-${product._id}`], 10) === i) { %> selected<% }
             %>><%=i %></option><% } %>
           </select>
-          <input type="hidden" id="<%=product._id %>" value="<%=product.name %>" />
         </div>
         <div class="col-sm-6"><%=priceFormat(product.grossPrice) %></div>
       </div><%
@@ -121,15 +120,15 @@
       <div class="row">
         <div class="col-sm-6 offset-md-4" id="delivery-type">
           <div class="form-check">
-            <input class="form-check-input" type="radio" id="collection" name="delivery-type" value="collection">
+            <input class="form-check-input" type="radio" id="collection" name="delivery-type" value="collection" checked="checked" />
             <label class="form-check-label" for="collection">Collection from Whisk</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="radio" id="delivery" name="delivery-type" value="delivery" disabled />
+            <input class="form-check-input" type="radio" id="delivery" name="delivery-type" value="delivery" />
             <label class="form-check-label" for="delivery">Delivery</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="radio" id="split-delivery" name="delivery-type" value="split-delivery" disabled>
+            <input class="form-check-input" type="radio" id="split-delivery" name="delivery-type" value="split-delivery" />
             <label class="form-check-label" for="split-delivery">Delivery to another person / multiple people</label>
           </div>
           <button type="button" class="btn icon-button btn-sm" data-toggle="modal" data-target="#deliveryZoneModal"><img class="delivery-icon" src="/icons/zone-map.png" alt="Delivery Zones" /> Delivery Zones</button>
@@ -150,7 +149,7 @@
           <label for="address" class="col-sm-4 col-form-label">Address</label>
           <div class="col-sm-6">
             <input type="text" class="form-control" id="address" name="address" autocomplete="off" placeholder="Address" value="<% if (body.address) { %><%=body.address %><% } %>">
-            <input type="hidden" id="zone" name="zone" value="<% if (body.zone) { %><%=body.zone %><% } else { %>0<% } %>">
+            <input type="hidden" id="zone" name="zone" value="<% if (body.zone) { %><%=body.zone %><% } else { %>-1<% } %>">
             <input type="hidden" id="google-formatted-address" name="google-formatted-address" value="<% if (body['google-formatted-address']) { %><%=body['google-formatted-address'] %><% } %>">
             <div id="message-address"></div>
           </div>

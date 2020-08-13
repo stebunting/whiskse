@@ -4,6 +4,7 @@ module.exports = {
     browser: true,
     es2020: true,
     node: true,
+    mocha: true,
     jquery: true
   },
   extends: [
@@ -11,7 +12,7 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: 11,
-    sourceType: 'module',
+    sourceType: 'module'
   },
   rules: {
     'comma-dangle': 0

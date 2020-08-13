@@ -362,5 +362,14 @@
         </coordinates>
       </Point>
     </Placemark>
+    <Placemark>
+      <name>Home</name>
+      <styleUrl>#icon-1899-0288D1-nodesc</styleUrl>
+      <Point>
+        <coordinates>
+          18.1118894,59.3415913,0
+        </coordinates>
+      </Point>
+    </Placemark>
   </Document>
 </kml>

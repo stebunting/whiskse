@@ -5,7 +5,6 @@ const tag = 'whiskse:whiskController';
 const axios = require('axios');
 const debug = require('debug')(tag);
 const { priceFormat, dateFormat, parseDateCode } = require('../functions/helper');
-const { normalizeUnits } = require('moment');
 
 // Constants
 const managementBaseUrl = process.env.MANAGEMENT_BASE_URL;
@@ -110,6 +109,7 @@ function whiskController() {
       const products = {};
       apiResponse.products.forEach((product) => {
         const deadlineType = product.deadline;
+        // eslint-disable-next-line no-underscore-dangle
         products[product._id] = timeframe[1].deadline[deadlineType].notPassed;
       });
       orderable[timeframe[0]] = {

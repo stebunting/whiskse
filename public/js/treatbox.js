@@ -4,8 +4,8 @@
 initialiseBoundaries();
 
 // Constants
-const managementBaseUrl = 'http://localhost:5000';
-// const managementBaseUrl = 'https://whisk-management.herokuapp.com';
+// const managementBaseUrl = 'http://localhost:5000';
+const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const animationTime = 400;
 
 // User Choices

@@ -1,29 +1,29 @@
 // Script to add form verification to html forms
-// Form must have form-validation="true" and a unique id
-// Each input must have form-validation="true" and form-validation-type="type"
+// Form must have data-validation="true" and a unique id
+// Each input must have data-validation="true" and data-validation-type="type"
 // type can be number, name, email, phone, notes, password, date
 // Submit button must have class form-validate
 
 // Clear messages and print current message
 function setValid(selector, valid) {
-  const id = selector.attr('id');
+  const element = document.getElementById(selector.attr('id'));
 
   if (valid === null) {
-    $(`#${id}`).removeClass('is-valid');
-    $(`#${id}`).removeClass('is-invalid');
+    element.classList.remove('is-valid');
+    element.classList.remove('is-invalid');
   } else if (!valid) {
-    $(`#${id}`).removeClass('is-valid');
-    $(`#${id}`).addClass('is-invalid');
+    element.classList.remove('is-valid');
+    element.classList.add('is-invalid');
   } else {
-    $(`#${id}`).removeClass('is-invalid');
-    $(`#${id}`).addClass('is-valid');
+    element.classList.remove('is-invalid');
+    element.classList.add('is-valid');
   }
 }
 
 // Function to validate input
 function validateInput(selector) {
   const value = selector.val();
-  const validationType = selector.attr('form-validation-type');
+  const validationType = selector.attr('data-validation-type');
   let valid = true;
 
   // Check that something has been entered
@@ -98,7 +98,7 @@ function validateInput(selector) {
         }
       }
 
-    // If invalid form-validation-type
+    // If invalid data-validation-type
     } else {
       valid = false;
     }

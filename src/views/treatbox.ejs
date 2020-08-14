@@ -51,7 +51,7 @@
   </div>
 
   <!-- Form -->
-  <form method="post" form-validation="true" id="treatbox-form" autocomplete="off">
+  <form method="post" data-validation="true" id="treatbox-form" autocomplete="off">
     <fieldset class="form-group" id="date-selector">
       <legend>When do you want to order for?</legend>
       <div class="form-group row">
@@ -77,7 +77,7 @@
       <div class="form-group row">
         <label class="col-sm-4" for="quantity-<%=product._id %>"><%=product.name %></label>
         <div class="col-sm-2 form-group">
-          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-deliverable="<%=product.deliverable %>" data-name="<%=product.name %>" data-deliverable-zone="<%=product.deliverableZone %>"><%
+          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-name="<%=product.name %>" data-deliverable-zone="<%=product.deliverableZone %>"><%
             for (let i = 0; i < 10; i += 1) { %>
             <option value="<%=i %>"<% 
               if (body[`quantity-${product._id}`] && parseInt(body[`quantity-${product._id}`], 10) === i) { %> selected<% }
@@ -95,21 +95,21 @@
       <div class="form-group row">
         <label for="name" class="col-sm-4 col-form-label">Name</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" form-validation-type="name" id="name" name="name" placeholder="Name" value="<% if (body.name) { %><%=body.name %><% } %>">
+          <input type="text" class="form-control" data-validation-type="name" id="name" name="name" placeholder="Name" value="<% if (body.name) { %><%=body.name %><% } %>">
         </div>
       </div>
       
       <div class="form-group row">
         <label for="email" class="col-sm-4 col-form-label">E-mail</label>
         <div class="col-sm-6">
-          <input type="email" class="form-control" form-validation-type="email" id="email" name="email" placeholder="E-mail" value="<% if (body.email) { %><%=body.email %><% } %>">
+          <input type="email" class="form-control" data-validation-type="email" id="email" name="email" placeholder="E-mail" value="<% if (body.email) { %><%=body.email %><% } %>">
         </div>
       </div>
       
       <div class="form-group row">
         <label for="telephone" class="col-sm-4 col-form-label">Telephone Number</label>
         <div class="col-sm-6">
-          <input type="text" class="form-control" form-validation-type="phone" id="telephone" name="telephone" placeholder="Telephone Number" value="<% if (body.telephone) { %><%=body.telephone %><% } %>">
+          <input type="text" class="form-control" data-validation-type="phone" id="telephone" name="telephone" placeholder="Telephone Number" value="<% if (body.telephone) { %><%=body.telephone %><% } %>">
         </div>
       </div>
     </fieldset>
@@ -186,21 +186,21 @@
       <div class="form-group row">
         <label for="items-to-deliver" class="col-md-4 col-form-label"><span class="recipient-legend-name-<%=id %>"></span> will receive</label>
         <div class="col-md-6">
-          <textarea class="form-control" form-validation-type="notes" height="5" id="items-to-deliver-<%=id %>" name="items-to-deliver-<%=id %>" readonly="true">Select items from above</textarea>
+          <textarea class="form-control" data-validation-type="notes" height="5" id="items-to-deliver-<%=id %>" name="items-to-deliver-<%=id %>" readonly="true">Select items from above</textarea>
         </div>
       </div>
 
       <div class="form-group row">
         <label for="name-<%=id %>" class="col-md-4 col-form-label">Name</label>
         <div class="col-md-6">
-          <input type="text" class="form-control" form-validation-type="name" id="name-<%=id %>" name="name-<%=id %>" placeholder="Name" value="<%=body[`name-${id}`] %>">
+          <input type="text" class="form-control" data-validation-type="name" id="name-<%=id %>" name="name-<%=id %>" placeholder="Name" value="<%=body[`name-${id}`] %>">
         </div>
       </div>
       
       <div class="form-group row">
         <label for="telephone-<%=id %>" class="col-md-4 col-form-label">Telephone Number</label>
         <div class="col-md-6">
-          <input type="telephone" class="form-control" form-validation-type="phone" id="telephone-<%=id %>" name="telephone-<%=id %>" placeholder="Telephone Number" value="<%=body[`telephone-${id}`] %>">
+          <input type="telephone" class="form-control" data-validation-type="phone" id="telephone-<%=id %>" name="telephone-<%=id %>" placeholder="Telephone Number" value="<%=body[`telephone-${id}`] %>">
         </div>
       </div>
 

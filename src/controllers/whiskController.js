@@ -14,7 +14,7 @@ function whiskController() {
   // Function to parse post data and call backend for statement
   async function getStatement(postData) {
     // Get Products Ordered
-    let basket = [];
+    const basket = [];
     const orders = Object.entries(postData).filter((x) => x[0].startsWith('quantity-'));
     for (let i = 0; i < orders.length; i += 1) {
       const [, id] = orders[i][0].split('-');
@@ -23,10 +23,9 @@ function whiskController() {
         basket.push({ id, quantity });
       }
     }
-    basket = JSON.stringify(basket);
 
     // Get Delivery Information
-    let delivery = [0, 0, 0, 0];
+    const delivery = [0, 0, 0, 0];
     if (postData['delivery-type'] === 'delivery') {
       const zone = parseInt(postData.zone, 10);
       delivery[zone] += 1;
@@ -38,7 +37,6 @@ function whiskController() {
         }
       });
     }
-    delivery = JSON.stringify(delivery);
 
     const axiosConfig = {
       method: 'post',
@@ -104,17 +102,17 @@ function whiskController() {
       debug(error);
     }
 
+    // Get orderable products by date
     const orderable = {};
-    Object.entries(apiResponse.timeframe).forEach((timeframe) => {
+    Object.keys(apiResponse.timeframe).forEach((date) => {
+      const timeframe = apiResponse.timeframe[date];
       const products = {};
       apiResponse.products.forEach((product) => {
-        const deadlineType = product.deadline;
+        const type = product.deadline;
         // eslint-disable-next-line no-underscore-dangle
-        products[product._id] = timeframe[1].deadline[deadlineType].notPassed;
+        products[product._id] = timeframe.deadline[type].notPassed;
       });
-      orderable[timeframe[0]] = {
-        products
-      };
+      orderable[date] = { products };
     });
 
     // Render Page

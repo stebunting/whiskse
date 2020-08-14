@@ -8,99 +8,129 @@ initialiseBoundaries();
 const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const animationTime = 400;
 
-// User Choices
-let basket = [];
-let items = [];
+/* HELPER FUNCTIONS */
+// Get Postfix for identifier dependant on id
+function getNamePostfix(id) {
+  return id != null && id !== '' ? `-${id}` : '';
+}
+
+// Splits identifier into field and MongoDB ID`
+function getDetailsFromMongoId(htmlId) {
+  if (htmlId == null) {
+    return { field: undefined, id: undefined };
+  }
+  const array = htmlId.split('-');
+  if (array.length < 2) {
+    return { field: undefined, id: undefined };
+  }
+  const [field, id] = array;
+  return { field, id };
+}
+
+// Splits selector identifier into field and recipient ID
+function getRecipientIdFromSelector(selector) {
+  const identifier = selector.attr('id');
+  if (identifier == null) {
+    return null;
+  }
+  const [, id] = identifier.split('-');
+  return id != null ? parseInt(id, 10) : null;
+}
+
+// Format number-type price in öre to user-viewable amount
+function priceFormat(num, options = {}) {
+  const includeOre = options.includeOre === true;
+  const str = (num / 100).toLocaleString(undefined, {
+    minimumFractionDigits: includeOre ? 2 : 0,
+    maximumFractionDigits: includeOre ? 2 : 0
+  });
+  return options.includeSymbol === false ? str : `${str} SEK`;
+}
+
+// List of Items
+const products = {
+  details: [],
+  basket: [],
+  update() {
+    const oldItems = this.details.filter((x) => x.recipient !== null);
+    this.details = [];
+    this.basket = [];
+    const quantities = document.querySelectorAll('*[id^="quantity-"]');
+    quantities.forEach((element) => {
+      const quantity = parseInt(element.value, 10);
+      const { id } = getDetailsFromMongoId(element.id);
+      const name = element.getAttribute('data-name');
+      const zone = parseInt(element.getAttribute('data-deliverable-zone'), 10);
+      if (quantity > 0) {
+        this.basket.push({ id, name, quantity });
+      }
+
+      for (let i = 0; i < quantity; i += 1) {
+        const recipientIndex = oldItems.findIndex((x) => x.id === id);
+        let recipient = null;
+        if (recipientIndex > -1) {
+          recipient = oldItems[recipientIndex].recipient;
+          oldItems.splice(recipientIndex, 1);
+        }
+
+        this.details.push({
+          id,
+          name,
+          zone,
+          recipient
+        });
+      }
+    });
+  },
+  for(recipientId) {
+    return this.details.filter((x) => x.recipient === recipientId);
+  }
+};
 let recipients = [];
 const codes = new Set();
 
 // Details
 let productsOrderable;
 
-// Show Purchaser/Delivery Details if hidden
+/* DISPLAY FUNCTIONS */
+// Reveal Purchaser/Delivery Details if hidden
 function showPurchaserDetails() {
   if (!$('#purchaser-details').is(':visible')) {
     $('#purchaser-details, #delivery-details').show(animationTime);
   }
 }
 
-function getNamePostfix(id) {
-  let namePostfix = '';
-  if (id != null) {
-    namePostfix = `-${id}`;
-  }
-  return namePostfix;
-}
+// Reveal correct delivery elements
+function showDeliveryElement(type) {
+  const defer = $.Deferred();
+  const collection = type === 'collection'
+    ? $('#user-collection').show(animationTime)
+    : $('#user-collection').hide(animationTime);
 
-function getDetailsFromId(htmlId) {
-  const [field, id] = htmlId.split('-');
-  return { field, id };
-}
+  const delivery = type === 'delivery'
+    ? $('#user-delivery').show(animationTime)
+    : $('#user-delivery').hide(animationTime);
 
-function priceFormat(num, userOptions = {}) {
-  const options = {
-    includeSymbol: userOptions.includeSymbol || true,
-    includeOre: userOptions.includeOre || false
-  };
-  let str = (num / 100).toLocaleString(undefined, {
-    minimumFractionDigits: options.includeOre ? 2 : 0,
-    maximumFractionDigits: options.includeOre ? 2 : 0
+  const splitDelivery = type === 'split-delivery'
+    ? $('fieldset[id^=recipient').show(animationTime)
+    : $('fieldset[id^=recipient').hide(animationTime);
+
+  $.when(collection, delivery, splitDelivery).done(() => {
+    defer.resolve();
   });
-  str += options.includeSymbol ? ' SEK' : '';
-  return str;
-}
-
-function updateItems() {
-  const oldItems = items.filter((x) => x.recipient !== null);
-  items = [];
-  $('select[id^=quantity-]').each(function callback() {
-    const quantity = parseInt($(this).val(), 10);
-    const { id } = getDetailsFromId($(this).attr('id'));
-
-    for (let i = 0; i < quantity; i += 1) {
-      const recipientIndex = oldItems.findIndex((x) => x.id === id);
-      let recipient = null;
-      if (recipientIndex > -1) {
-        recipient = oldItems[recipientIndex].recipient;
-        oldItems.splice(recipientIndex, 1);
-      }
-
-      items.push({
-        id,
-        name: $(`#quantity-${id}`).attr('data-name'),
-        zone: parseInt($(`#quantity-${id}`).attr('data-deliverable-zone'), 10),
-        recipient
-      });
-    }
-  });
+  return defer;
 }
 
 // Update Price
 function updatePrice() {
-  basket = [];
-  $('select[id^=quantity-]').each(function callback() {
-    const quantity = parseInt($(this).val(), 10);
-    if (quantity > 0) {
-      const { id } = getDetailsFromId($(this).attr('id'));
-      const item = {
-        id,
-        name: $(`#quantity-${id}`).attr('data-name'),
-        quantity
-      };
-      basket.push(item);
-    }
-  });
-
-  // Array to hold number of deliveries in zones 0-3
-  let delivery = [0, 0, 0, 0];
+  const delivery = [0, 0, 0, 0];
   if (!$('#collection').is(':checked')) {
     $('input[id^=zone]').each(function callback() {
-      const postfix = getDetailsFromId($(this).attr('id'));
-      let inputIdSelector = $('#address');
-      if (postfix.id != null) {
-        inputIdSelector = $(`#address-${postfix.id}`);
-      }
-      if (inputIdSelector.is(':visible')) {
+      const recipientId = getRecipientIdFromSelector($(this));
+      const inputIdSelector = recipientId != null
+        ? $(`#address-${recipientId}`)
+        : $('#address');
+      if (inputIdSelector.is(':visible') && inputIdSelector.hasClass('is-valid')) {
         const zone = parseInt($(this).val(), 10);
         if (zone >= 0 && zone <= 3) {
           delivery[zone] += 1;
@@ -108,39 +138,35 @@ function updatePrice() {
       }
     });
   }
-  delivery = JSON.stringify(delivery);
 
-  $.ajax({
-    method: 'post',
-    url: `${managementBaseUrl}/treatbox/lookupprice`,
-    data: {
-      basket: JSON.stringify(basket),
+  fetch(`${managementBaseUrl}/treatbox/lookupprice`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      basket: products.basket,
       delivery,
-      codes: JSON.stringify(Array.from(codes))
-    }
-  }).then((data) => {
-    if (data.status === 'OK') {
-      $('#food-cost').text(priceFormat(data.bottomLine.foodCost));
-      $('#food-moms').text(priceFormat(data.bottomLine.foodMoms, { includeOre: true }));
-      $('#delivery-cost').text(priceFormat(data.bottomLine.deliveryCost));
-      $('#delivery-moms').text(priceFormat(data.bottomLine.deliveryMoms, { includeOre: true }));
-      $('#total-cost').text(priceFormat(data.bottomLine.total));
-      data.delivery.forEach((zone) => {
-        const price = zone.price !== 0 ? priceFormat(zone.price) : 'Free';
-        $(`.zone${zone.zone}-surcharge-amount`).text(price);
-      });
-    }
-  });
+      codes: Array.from(codes)
+    })
+  }).then((response) => response.json())
+    .then((data) => {
+      if (data.status === 'OK') {
+        $('#food-cost').text(priceFormat(data.bottomLine.foodCost));
+        $('#food-moms').text(priceFormat(data.bottomLine.foodMoms, { includeOre: true }));
+        $('#delivery-cost').text(priceFormat(data.bottomLine.deliveryCost));
+        $('#delivery-moms').text(priceFormat(data.bottomLine.deliveryMoms, { includeOre: true }));
+        $('#total-cost').text(priceFormat(data.bottomLine.total));
+        data.delivery.forEach((zone) => {
+          const price = zone.price !== 0 ? priceFormat(zone.price) : 'Free';
+          $(`.zone${zone.zone}-surcharge-amount`).text(price);
+        });
+      }
+    });
 }
 
 // Validate address and generate message
-function validateGoogleAddress(recipientId, userOptions = {}) {
-  const options = {};
-  if (userOptions.allowBlank === false) {
-    options.allowBlank = false;
-  } else {
-    options.allowBlank = true;
-  }
+function validateGoogleAddress(recipientId, options = {}) {
   const namePostfix = getNamePostfix(recipientId);
 
   const selector = $(`#address${namePostfix}`);
@@ -151,13 +177,16 @@ function validateGoogleAddress(recipientId, userOptions = {}) {
   let valid = true;
   const message = [];
 
-  if (items.length === 0 || (options.allowBlank && addressToValidate === '')) {
+  if (options.allowBlank !== false && addressToValidate === '') {
     valid = null;
   } else if (addressToValidate === '' || googleAddress !== addressToValidate || Number.isNaN(zone)) {
     message.push('Invalid Address, please select from dropdown menu');
     valid = false;
   } else {
-    const highestZone = items.map((x) => x.zone).reduce((a, b) => Math.max(a, b));
+    const usersItems = products.for(recipientId);
+    const highestZone = usersItems.length > 0
+      ? usersItems.map((x) => x.zone).reduce((a, b) => Math.max(a, b))
+      : 2;
     valid = highestZone >= zone;
 
     if (zone === 0) {
@@ -167,7 +196,7 @@ function validateGoogleAddress(recipientId, userOptions = {}) {
     }
 
     if (valid) {
-      message.push(`<span class="zone${zone}-surcharge-amount"></span> Delivery`);
+      message.push(`<span class="zone${zone}-surcharge-amount">Free</span> Delivery`);
     } else {
       message.push('Delivery not available');
     }
@@ -201,9 +230,9 @@ function setUpAddressDropdown(recipientId) {
     const googleLocation = autocomplete.getPlace();
 
     // Set and Validate Delivery Address
-    $(`#address${namePostfix}`).val(googleLocation.formatted_address);
-    $(`#google-formatted-address${namePostfix}`).val(googleLocation.formatted_address);
-    $(`#zone${namePostfix}`).val(getZone(googleLocation.geometry.location));
+    document.getElementById(`address${namePostfix}`).value = googleLocation.formatted_address;
+    document.getElementById(`google-formatted-address${namePostfix}`).value = googleLocation.formatted_address;
+    document.getElementById(`zone${namePostfix}`).value = getZone(googleLocation.geometry.location);
     validateGoogleAddress(recipientId);
   });
 
@@ -213,7 +242,7 @@ function setUpAddressDropdown(recipientId) {
 
 function updateTextAreas() {
   recipients.forEach((recipient) => {
-    const recipientsItems = items
+    const recipientsItems = products.details
       .filter((x) => x.recipient === recipient)
       .map((x) => x.name)
       .sort();
@@ -228,10 +257,10 @@ function updateTextAreas() {
 }
 
 function setAddRemoveRecipientStatus() {
-  const unassignedItems = items.filter((x) => x.recipient === null).length;
+  const unassignedItems = products.details.filter((x) => x.recipient === null).length;
   let assigned = recipients.length;
   for (let i = 0; i < recipients.length; i += 1) {
-    if (items.filter((x) => x.recipient === recipients[i]).length > 0) {
+    if (products.details.filter((x) => x.recipient === recipients[i]).length > 0) {
       assigned -= 1;
     }
   }
@@ -245,7 +274,7 @@ function setAddRemoveRecipientStatus() {
 function updateButtonRow() {
   recipients.forEach((recipient) => {
     let buttons = '';
-    items.forEach((item, index) => {
+    products.details.forEach((item, index) => {
       const selector = `${recipient}-item-${item.id}-${index}`;
       let buttonType = 'btn-info';
       let cross = '';
@@ -260,26 +289,27 @@ function updateButtonRow() {
       buttons += `<button type="button" class="btn ${buttonType} item-button btn-sm" id="${selector}" name="${selector}"${disabled}>${cross}${item.name}</button>`;
     });
     $(`#button-row-${recipient}`).html(buttons);
-    items.forEach((item, index) => {
+    products.details.forEach((item, index) => {
       const selector = `${recipient}-item-${item.id}-${index}`;
       $(`#${selector}`).click(() => {
         if (item.recipient !== null) {
-          items[index].recipient = null;
+          products.details[index].recipient = null;
         } else {
-          items[index].recipient = recipient;
+          products.details[index].recipient = recipient;
         }
         updateButtonRow();
         updateTextAreas();
         setAddRemoveRecipientStatus();
         validateInput($(`#items-to-deliver-${recipient}`));
+        validateGoogleAddress(recipient);
       });
     });
   });
-  $('#items').val(JSON.stringify(items));
+  $('#items').val(JSON.stringify(products.details));
 }
 
 function removeRecipient(id) {
-  items.map((x) => {
+  products.details.map((x) => {
     const y = x;
     if (y.recipient === id) {
       y.recipient = null;
@@ -317,21 +347,21 @@ function addNewRecipient() {
       <div class="form-group row">
         <label for="items-to-deliver" class="col-md-4 col-form-label"><span class="recipient-legend-name-${id}">Recipient</span> will receive</label>
         <div class="col-md-6">
-          <textarea class="form-control" form-validation-type="notes" height="5" id="items-to-deliver-${id}" name="items-to-deliver-${id}" readonly="true">Select items from above</textarea>
+          <textarea class="form-control" data-validation-type="notes" height="5" id="items-to-deliver-${id}" name="items-to-deliver-${id}" readonly="true">Select items from above</textarea>
         </div>
       </div>
 
       <div class="form-group row">
         <label for="name-${id}" class="col-md-4 col-form-label">Name</label>
         <div class="col-md-6">
-          <input type="text" class="form-control" form-validation-type="name" id="name-${id}" name="name-${id}" placeholder="Name">
+          <input type="text" class="form-control" data-validation-type="name" id="name-${id}" name="name-${id}" placeholder="Name">
         </div>
       </div>
       
       <div class="form-group row">
         <label for="telephone-${id}" class="col-md-4 col-form-label">Telephone Number</label>
         <div class="col-md-6">
-          <input type="telephone" class="form-control" form-validation-type="phone" id="telephone-${id}" name="telephone-${id}" placeholder="Telephone Number">
+          <input type="telephone" class="form-control" data-validation-type="phone" id="telephone-${id}" name="telephone-${id}" placeholder="Telephone Number">
         </div>
       </div>
 
@@ -394,14 +424,6 @@ function addNewRecipient() {
   $(`#address-${id}`).focusout(() => validateGoogleAddress(id));
 }
 
-function getIdFromSelector(selector) {
-  let [, id] = selector.attr('id').split('-');
-  if (id != null) {
-    id = parseInt(id, 10);
-  }
-  return id;
-}
-
 function validateAllInputs() {
   let valid = true;
   $('input[id^=name], input[id^=email], input[id^=telephone], textarea[id^=items-to-deliver]').each(function callback() {
@@ -411,7 +433,7 @@ function validateAllInputs() {
   });
   $('input[id^=address]').each(function callback() {
     if ($(this).is(':visible')) {
-      const { id } = getDetailsFromId($(this).attr('id'));
+      const { id } = getDetailsFromMongoId($(this).attr('id'));
       valid = validateGoogleAddress(id) && valid;
     }
   });
@@ -438,7 +460,7 @@ async function lookupRebateCode(code) {
             $(this).attr('data-deliverable-zone', '3');
           }
         });
-        updateItems();
+        products.update();
         touchAllAddresses();
         break;
 
@@ -454,12 +476,18 @@ async function lookupRebateCode(code) {
 }
 
 function updateProductAvailability() {
-  const selectedDate = $('#date').val();
-  Object.entries(productsOrderable[selectedDate].products).forEach((product) => {
-    if (!product[1]) {
-      $(`#quantity-${product[0]}`).val(0).trigger('change').prop('disabled', true);
+  const selectedDate = document.getElementById('date').value;
+  const orderableProduct = productsOrderable[selectedDate].products;
+  Object.keys(orderableProduct).forEach((id) => {
+    const element = document.getElementById(`quantity-${id}`);
+    if (orderableProduct[id]) {
+      element.disabled = false;
     } else {
-      $(`#quantity-${product[0]}`).prop('disabled', false);
+      if (element.value > 0) {
+        element.value = 0;
+        $(`#quantity-${id}`).trigger('change');
+      }
+      element.disabled = true;
     }
   });
 }
@@ -469,28 +497,29 @@ $(() => {
   // Get orderable productsOrderable from DOM
   productsOrderable = window.orderable;
 
+  // Update product availability when date changed
+  $('#date').change(updateProductAvailability);
+
   // Select Items
   $('select[id^=quantity-]').change(() => {
-    updateItems();
+    products.update();
     updateButtonRow();
+    setAddRemoveRecipientStatus();
     showPurchaserDetails();
     touchAllAddresses();
   });
 
-  // Update product availability when date changed
-  $('#date').change(updateProductAvailability);
-
   // Validate User Details as they are entered
   $('input[id^=name]').focusout(function callback() {
-    const id = getIdFromSelector($(this));
+    // Update Legend Title if split delivery recipient
+    const id = getRecipientIdFromSelector($(this));
     if (id != null) {
-      let name = $(this).val();
       const index = recipients.findIndex((x) => x === id);
-      if (name === '') {
-        name = `Recipient ${index + 1}`;
-      }
+      const name = $(this).val() === '' ? `Recipient ${index + 1}` : $(this).val();
       $(`.recipient-legend-name-${id}`).text(name);
     }
+
+    // Validate Input
     validateInput($(this));
   });
   $('input[id^=email], input[id^=telephone]').focusout(function callback() {
@@ -498,40 +527,19 @@ $(() => {
   });
 
   // Delivery Type
-  $('#delivery').click(() => {
-    const collectionHidden = $('#user-collection').hide(animationTime);
-    const recipientsHidden = $('fieldset[id^=recipient').hide(animationTime);
-    const deliveryShown = $('#user-delivery').show(animationTime);
-    $('#address, #notes-address').prop('disabled', false);
-    $.when(collectionHidden, deliveryShown, recipientsHidden).done(() => {
+  $('#delivery, #collection, #split-delivery').click(function callback() {
+    const id = $(this).attr('id');
+    showDeliveryElement(id).done(() => {
       updatePrice();
     });
-  });
-
-  $('#collection').click(() => {
-    const collectionShown = $('#user-collection').show(animationTime);
-    const deliveryHidden = $('#user-delivery').hide(animationTime);
-    const recipientsHidden = $('fieldset[id^=recipient').hide(animationTime);
-    $.when(collectionShown, deliveryHidden, recipientsHidden).done(() => {
-      updatePrice();
-    });
-  });
-
-  $('#split-delivery').click(() => {
-    const collectionHidden = $('#user-collection').hide(animationTime);
-    const deliveryHidden = $('#user-delivery').hide(animationTime);
-    const recipientsShown = $('fieldset[id^=recipient').show(animationTime);
-    $.when(collectionHidden, deliveryHidden, recipientsShown).done(() => {
-      updatePrice();
-    });
-    if (recipients.length === 0) {
+    if (id === 'split-delivery' && recipients.length === 0) {
       addNewRecipient();
     }
   });
 
   // Address
   $('input[id^=address]').each(function callback() {
-    const id = getIdFromSelector($(this));
+    const id = getRecipientIdFromSelector($(this));
     setUpAddressDropdown(id);
     $(this).focusout(() => validateGoogleAddress(id));
   });
@@ -541,7 +549,7 @@ $(() => {
     addNewRecipient();
   });
   $('.removerecipient').each(function callback() {
-    const id = getIdFromSelector($(this));
+    const id = getRecipientIdFromSelector($(this));
     $(this).click(() => {
       removeRecipient(id);
     });
@@ -575,7 +583,7 @@ $(() => {
   // Check if form is posted
   if (window.post) {
     if (window.deliveryType === 'split-delivery') {
-      items = JSON.parse($('#items').val());
+      products.details = JSON.parse($('#items').val());
       recipients = JSON.parse($('#recipients').val());
       updateButtonRow();
       updateTextAreas();

@@ -1,6 +1,9 @@
 /* global google */
 /* eslint-disable-next-line no-unused-vars */
 function initMap() {
+  const googleApiLoadedEvent = new Event('google-api-loaded');
+  document.dispatchEvent(googleApiLoadedEvent);
+
   const mapStyle = new google.maps.StyledMapType([
     // https://snazzymaps.com/style/36739/light-grey
     {

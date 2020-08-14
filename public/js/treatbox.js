@@ -1,8 +1,5 @@
 /* global google, validateInput, setValid, initialiseBoundaries, getZone */
 
-// Initialise Boundaries
-initialiseBoundaries();
-
 // Constants
 // const managementBaseUrl = 'http://localhost:5000';
 const managementBaseUrl = 'https://whisk-management.herokuapp.com';
@@ -492,8 +489,10 @@ function updateProductAvailability() {
   });
 }
 
-// On DOM Loaded...
-$(() => {
+// On Google API Loaded...
+document.addEventListener('google-api-loaded', () => {
+  initialiseBoundaries();
+
   // Get orderable productsOrderable from DOM
   productsOrderable = window.orderable;
 

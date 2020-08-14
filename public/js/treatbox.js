@@ -82,7 +82,7 @@ const products = {
       }
     });
   },
-  for(recipientId) {
+  for(recipientId = null) {
     return this.details.filter((x) => x.recipient === recipientId);
   }
 };

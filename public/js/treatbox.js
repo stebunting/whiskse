@@ -1,9 +1,9 @@
-/* global google, validateInput, setValid, initialiseBoundaries, getZone */
-
+/* global google, ejs, validateInput, setValid, initialiseBoundaries, getZone */
 // Constants
 // const managementBaseUrl = 'http://localhost:5000';
 const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const animationTime = 400;
+const templates = {};
 
 /* HELPER FUNCTIONS */
 // Get Postfix for identifier dependant on id
@@ -332,67 +332,7 @@ function addNewRecipient() {
   recipients.push(id);
   $('#recipients').val(JSON.stringify(recipients));
 
-  const html = `
-      <fieldset class="form-group" id="recipient-${id}">
-      <legend class="recipient-legend-name-${id}">Recipient</legend>
-
-      <div class="form-group row">
-        <label for="buttons" class="col-md-4 col-form-label">Select items to deliver</label>
-        <div class="col-md-8 button-row" id="button-row-${id}"></div>
-      </div>
-    
-      <div class="form-group row">
-        <label for="items-to-deliver" class="col-md-4 col-form-label"><span class="recipient-legend-name-${id}">Recipient</span> will receive</label>
-        <div class="col-md-6">
-          <textarea class="form-control" data-validation-type="notes" height="5" id="items-to-deliver-${id}" name="items-to-deliver-${id}" readonly="true">Select items from above</textarea>
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="name-${id}" class="col-md-4 col-form-label">Name</label>
-        <div class="col-md-6">
-          <input type="text" class="form-control" data-validation-type="name" id="name-${id}" name="name-${id}" placeholder="Name">
-        </div>
-      </div>
-      
-      <div class="form-group row">
-        <label for="telephone-${id}" class="col-md-4 col-form-label">Telephone Number</label>
-        <div class="col-md-6">
-          <input type="telephone" class="form-control" data-validation-type="phone" id="telephone-${id}" name="telephone-${id}" placeholder="Telephone Number">
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <label for="address-${id}" class="col-md-4 col-form-label">Address</label>
-        <div class="col-md-6">
-          <input type="text" class="form-control" id="address-${id}" name="address-${id}" autocomplete="off" placeholder="Address">
-          <input type="hidden" id="zone-${id}" name="zone-${id}">
-          <input type="hidden" id="google-formatted-address-${id}" name="google-formatted-address-${id}">
-          <div id="message-address-${id}"></div>
-        </div>
-      </div>
-      
-      <div class="form-group row">
-        <label for="notes-address-${id}" class="col-md-4 col-form-label">Delivery Notes<br />(please include doorcode and floor)</label>
-        <div class="col-md-6">
-          <input type="text" class="form-control" id="notes-address-${id}" name="notes-address-${id}" placeholder="Delivery Notes">
-        </div>
-      </div>
-      
-      <div class="form-group row">
-        <label for="message-${id}" class="col-md-4 col-form-label">Optional Message</label>
-        <div class="col-md-6">
-          <input type="text" class="form-control" id="message-${id}" name="message-${id}" placeholder="Message">
-        </div>
-      </div>
-
-      <div class="form-group row">
-        <div class="col-md-6 offset-md-4">
-          <button type="button" class="btn btn-success item-button add-recipient" id="add-recipient-${id}" name="add-recipient">Add New Recipient</button>
-          <button type="button" class="btn btn-danger item-button removerecipient" id="removerecipient-${id}" name="removerecipient">Remove</button>
-        </div>
-      </div>
-    </fieldset>`;
+  const html = ejs.render(templates.newrecipient, { id });
 
   $(html).insertBefore('#submit-fieldset').hide().show(animationTime);
   updateButtonRow();
@@ -492,6 +432,13 @@ function updateProductAvailability() {
 // On Google API Loaded...
 document.addEventListener('google-api-loaded', () => {
   initialiseBoundaries();
+
+  // Get new recipient template
+  fetch('/templates/newrecipient.ejs')
+    .then((response) => response.text())
+    .then((data) => {
+      templates.newrecipient = data;
+    });
 
   // Get orderable productsOrderable from DOM
   productsOrderable = window.orderable;

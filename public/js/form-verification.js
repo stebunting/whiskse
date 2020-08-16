@@ -5,9 +5,7 @@
 // Submit button must have class form-validate
 
 // Clear messages and print current message
-function setValid(selector, valid) {
-  const element = document.getElementById(selector.attr('id'));
-
+function setValid(element, valid) {
   if (valid === null) {
     element.classList.remove('is-valid');
     element.classList.remove('is-invalid');
@@ -21,9 +19,10 @@ function setValid(selector, valid) {
 }
 
 // Function to validate input
-function validateInput(selector) {
-  const value = selector.val();
-  const validationType = selector.attr('data-validation-type');
+function validateInput(id) {
+  const element = document.getElementById(id);
+  const { value } = element;
+  const validationType = element.getAttribute('data-validation-type');
   let valid = true;
 
   // Check that something has been entered
@@ -75,7 +74,7 @@ function validateInput(selector) {
 
     // Check that notes is not empty
     } else if (validationType === 'notes') {
-      valid = value != 'Select items from above';
+      valid = value !== 'Select items from above';
 
     // Check that password is not empty
     } else if (validationType === 'password') {
@@ -108,6 +107,6 @@ function validateInput(selector) {
     valid = false;
   }
 
-  setValid(selector, valid);
+  setValid(element, valid);
   return valid;
 }

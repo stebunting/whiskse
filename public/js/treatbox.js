@@ -109,10 +109,14 @@ function showDeliveryElement(type) {
     : $('#user-delivery').hide(animationTime);
 
   const splitDelivery = type === 'split-delivery'
+    ? $('#split-delivery-buttons').show(animationTime)
+    : $('#split-delivery-buttons').hide(animationTime);
+
+  const splitDeliveryRecipients = type === 'split-delivery'
     ? $('fieldset[id^=recipient').show(animationTime)
     : $('fieldset[id^=recipient').hide(animationTime);
 
-  $.when(collection, delivery, splitDelivery).done(() => {
+  $.when(collection, delivery, splitDelivery, splitDeliveryRecipients).done(() => {
     defer.resolve();
   });
   return defer;
@@ -166,10 +170,10 @@ function updatePrice() {
 function validateGoogleAddress(recipientId, options = {}) {
   const namePostfix = getNamePostfix(recipientId);
 
-  const selector = $(`#address${namePostfix}`);
-  const addressToValidate = $(`#address${namePostfix}`).val();
-  const googleAddress = $(`#google-formatted-address${namePostfix}`).val();
-  const zone = parseInt($(`#zone${namePostfix}`).val(), 10);
+  const element = document.getElementById(`address${namePostfix}`);
+  const addressToValidate = element.value;
+  const googleAddress = document.getElementById(`google-formatted-address${namePostfix}`).value;
+  const zone = parseInt(document.getElementById(`zone${namePostfix}`).value, 10);
 
   let valid = true;
   const message = [];
@@ -199,8 +203,8 @@ function validateGoogleAddress(recipientId, options = {}) {
     }
   }
 
-  setValid(selector, valid);
-  $(`#message-address${namePostfix}`).html(message.join(' // '));
+  setValid(element, valid);
+  document.getElementById(`message-address${namePostfix}`).innerHTML = message.join(' // ');
   updatePrice();
 
   return valid;
@@ -234,7 +238,11 @@ function setUpAddressDropdown(recipientId) {
   });
 
   // Enter key should select Autocomplete item when list is open
-  $(`#address${namePostfix}`).keydown((e) => !(e.which === 13 && $('.pac-container:visible').length));
+  document.getElementById(`address${namePostfix}`).addEventListener('keydown', (event) => {
+    const pacContainer = document.getElementsByClassName('pac-container');
+    const pacContainerVisible = window.getComputedStyle(pacContainer[0]).display !== 'none';
+    return !(event.which === 13 && pacContainerVisible);
+  });
 }
 
 function updateTextAreas() {
@@ -249,22 +257,23 @@ function updateTextAreas() {
     });
     const listItemsArray = Object.entries(counts).map((x) => `${x[1]} x ${x[0]}`);
     const listItems = listItemsArray.length > 0 ? listItemsArray.join(', ') : 'Select items from above';
-    $(`#items-to-deliver-${recipient}`).val(listItems);
+    document.getElementById(`items-to-deliver-${recipient}`).value = listItems;
   });
 }
 
 function setAddRemoveRecipientStatus() {
   const unassignedItems = products.details.filter((x) => x.recipient === null).length;
   let assigned = recipients.length;
-  for (let i = 0; i < recipients.length; i += 1) {
-    if (products.details.filter((x) => x.recipient === recipients[i]).length > 0) {
+  recipients.forEach((recipient) => {
+    const recipientHasItems = products.details
+      .filter((x) => x.recipient === recipient).length > 0;
+    if (recipientHasItems) {
       assigned -= 1;
     }
-  }
-  if (unassignedItems - assigned > 0) {
-    $('.add-recipient').prop('disabled', false);
-  } else {
-    $('.add-recipient').prop('disabled', true);
+  });
+  const buttons = document.getElementsByClassName('add-recipient');
+  for (let i = 0; i < buttons.length; i += 1) {
+    buttons[i].disabled = unassignedItems - assigned === 0;
   }
 }
 
@@ -297,7 +306,7 @@ function updateButtonRow() {
         updateButtonRow();
         updateTextAreas();
         setAddRemoveRecipientStatus();
-        validateInput($(`#items-to-deliver-${recipient}`));
+        validateInput(`items-to-deliver-${recipient}`);
         validateGoogleAddress(recipient);
       });
     });
@@ -347,13 +356,13 @@ function addNewRecipient() {
 
   // Validate Name
   $(`#name-${id}`).focusout(function callback() {
-    validateInput($(this));
+    validateInput($(this).attr('id'));
     $(`.recipient-legend-name-${id}`).text($(this).val());
   });
 
   // Validate Telephone Number
   $(`#telephone-${id}`).focusout(function callback() {
-    validateInput($(this));
+    validateInput($(this).attr('id'));
   });
 
   // Address
@@ -365,7 +374,7 @@ function validateAllInputs() {
   let valid = true;
   $('input[id^=name], input[id^=email], input[id^=telephone], textarea[id^=items-to-deliver]').each(function callback() {
     if ($(this).is(':visible')) {
-      valid = validateInput($(this)) && valid;
+      valid = validateInput($(this).attr('id')) && valid;
     }
   });
   $('input[id^=address]').each(function callback() {
@@ -466,10 +475,10 @@ document.addEventListener('google-api-loaded', () => {
     }
 
     // Validate Input
-    validateInput($(this));
+    validateInput($(this).attr('id'));
   });
   $('input[id^=email], input[id^=telephone]').focusout(function callback() {
-    validateInput($(this));
+    validateInput($(this).attr('id'));
   });
 
   // Delivery Type

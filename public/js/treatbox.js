@@ -3,7 +3,22 @@
 // const managementBaseUrl = 'http://localhost:5000';
 const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const animationTime = 400;
-const templates = {};
+const templates = {
+  buttonRow: `<% buttons.forEach((button) => { %>
+<button type="button" class="btn <%
+  if (button.recipient == null) {
+    %>btn-info<%
+   } else {
+     %>btn-secondary<%
+   } %> item-button btn-sm" id="<%=button.id %>" name="<%=button.id %>"<%
+   if (button.disabled) {
+    %> disabled="true"<%
+   } %>><%
+   if (button.recipient != null && !button.disabled) {
+     %>&times;&nbsp;<%
+   } %><%=button.name %></button><%
+}); %>`
+};
 
 /* HELPER FUNCTIONS */
 // Get Postfix for identifier dependant on id
@@ -279,25 +294,21 @@ function setAddRemoveRecipientStatus() {
 
 function updateButtonRow() {
   recipients.forEach((recipient) => {
-    let buttons = '';
+    const buttons = [];
     products.details.forEach((item, index) => {
-      const selector = `${recipient}-item-${item.id}-${index}`;
-      let buttonType = 'btn-info';
-      let cross = '';
-      let disabled = '';
-      if (item.recipient !== null) {
-        cross = '&times; ';
-        buttonType = 'btn-secondary';
-        if (item.recipient !== recipient) {
-          disabled = ' disabled="true"';
-        }
-      }
-      buttons += `<button type="button" class="btn ${buttonType} item-button btn-sm" id="${selector}" name="${selector}"${disabled}>${cross}${item.name}</button>`;
+      buttons.push({
+        recipient: item.recipient,
+        name: item.name,
+        id: `${recipient}-item-${item.id}-${index}`,
+        disabled: item.recipient !== null && item.recipient !== recipient
+      });
     });
-    $(`#button-row-${recipient}`).html(buttons);
+    const buttonRow = ejs.render(templates.buttonRow, { buttons });
+    document.getElementById(`button-row-${recipient}`).innerHTML = buttonRow;
+
     products.details.forEach((item, index) => {
-      const selector = `${recipient}-item-${item.id}-${index}`;
-      $(`#${selector}`).click(() => {
+      const id = `${recipient}-item-${item.id}-${index}`;
+      document.getElementById(id).addEventListener('click', () => {
         if (item.recipient !== null) {
           products.details[index].recipient = null;
         } else {
@@ -311,7 +322,7 @@ function updateButtonRow() {
       });
     });
   });
-  $('#items').val(JSON.stringify(products.details));
+  document.getElementById('items').value = JSON.stringify(products.details);
 }
 
 function removeRecipient(id) {

@@ -347,23 +347,22 @@ function removeRecipient(id) {
 }
 
 function addNewRecipient() {
-  let id = 0;
-  if (recipients.length > 0) {
-    id = recipients[recipients.length - 1] + 1;
-  }
+  const id = recipients.length > 0
+    ? recipients[recipients.length - 1] + 1
+    : 0;
   recipients.push(id);
-  $('#recipients').val(JSON.stringify(recipients));
+  document.getElementById('recipients').value = JSON.stringify(recipients);
 
-  const html = ejs.render(templates.newrecipient, { id });
+  const newRecipient = ejs.render(templates.newrecipient, { id });
 
-  $(html).insertBefore('#submit-fieldset').hide().show(animationTime);
+  $(newRecipient).insertBefore('#submit-fieldset').hide().show(animationTime);
   updateButtonRow();
   setAddRemoveRecipientStatus();
 
-  $(`#add-recipient-${id}`).click(() => {
+  document.getElementById(`add-recipient-${id}`).addEventListener('click', () => {
     addNewRecipient();
   });
-  $(`#removerecipient-${id}`).click(() => {
+  document.getElementById(`removerecipient-${id}`).addEventListener('click', () => {
     removeRecipient(id);
   });
 

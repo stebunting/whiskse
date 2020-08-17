@@ -292,8 +292,10 @@ function setAddRemoveRecipientStatus() {
   }
 }
 
+// Function to create button row for selecting items for each recipient
 function updateButtonRow() {
   recipients.forEach((recipient) => {
+    // Render Buttons
     const buttons = [];
     products.details.forEach((item, index) => {
       buttons.push({
@@ -306,6 +308,7 @@ function updateButtonRow() {
     const buttonRow = ejs.render(templates.buttonRow, { buttons });
     document.getElementById(`button-row-${recipient}`).innerHTML = buttonRow;
 
+    // Add Click Handlers to each button
     products.details.forEach((item, index) => {
       const id = `${recipient}-item-${item.id}-${index}`;
       document.getElementById(id).addEventListener('click', () => {
@@ -334,10 +337,9 @@ function removeRecipient(id) {
     return y;
   });
 
-  $(`#recipient-${id}`).remove();
-  const index = recipients.findIndex((x) => x === id);
-  recipients.splice(index, 1);
-  $('#recipients').val(JSON.stringify(recipients));
+  document.getElementById(`recipient-${id}`).remove();
+  recipients.splice(recipients.findIndex((x) => x === id), 1);
+  document.getElementById('recipients').value = JSON.stringify(recipients);
 
   updatePrice();
   updateButtonRow();

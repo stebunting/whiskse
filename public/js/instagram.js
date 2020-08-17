@@ -1,31 +1,19 @@
-const serverRoot = 'https://whisk-management.herokuapp.com';
+/* global ejs */
+const template = `<%
+data.forEach((item, index) => {
+  if (index % 3 === 0) { %>
+<div class="row latest-instagram"><% } %>
+  <a href="<%=item.permalink %>" target="_blank" rel="external">
+    <img class="instagram-thumb" src="<%=item.media_url %>" alt="<%=item.caption %>" />
+  </a><%
+  if (index % 3 === 2) { %>
+</div><% }
+}); %>`;
+const container = document.getElementById('instagram-container');
 
-// Generate HTML script for 1 Instagram image
-function generateInstagramEntry(item) {
-  const html = `<a href="${item.permalink}" target="_blank" rel="external"><img class="instagram_thumb" src="${item.media_url}" alt="${item.caption}" /></a>`;
-  return html;
-}
-
-$(() => {
-  // Get Instagram images
-  $.ajax({
-    method: 'get',
-    url: `${serverRoot}/user/instagram`
-  }).then((data) => {
-    // Display latest Instagram images to page
-    let html = '';
-
-    for (let i = 0; i < data.length; i += 1) {
-      if (i % 3 === 0) {
-        html += '<div class="row latest-instagram">';
-      }
-
-      html += generateInstagramEntry(data[i]);
-
-      if (i % 3 === 2) {
-        html += '</div>';
-      }
-    }
-    $(html).insertAfter('#instagram-images-header');
+// Get Instagram images
+fetch('https://whisk-management.herokuapp.com/user/instagram')
+  .then((response) => response.json())
+  .then((data) => {
+    container.innerHTML = ejs.render(template, { data });
   });
-});

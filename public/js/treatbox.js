@@ -1,8 +1,7 @@
 /* global google, ejs, validateInput, setValid, initialiseBoundaries, getZone */
 // Constants
-// const managementBaseUrl = 'http://localhost:5000';
-const managementBaseUrl = 'https://whisk-management.herokuapp.com';
-const animationTime = 400;
+const managementBaseUrl = 'http://localhost:5000';
+// const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const templates = {
   buttonRow: `<% buttons.forEach((button) => { %>
 <button type="button" class="btn <%
@@ -32,16 +31,13 @@ function getDetailsFromMongoId(htmlId) {
     return { field: undefined, id: undefined };
   }
   const array = htmlId.split('-');
-  if (array.length < 2) {
-    return { field: undefined, id: undefined };
-  }
   const [field, id] = array;
   return { field, id };
 }
 
-// Splits selector identifier into field and recipient ID
-function getRecipientIdFromSelector(selector) {
-  const identifier = selector.attr('id');
+// Splits element identifier into field and recipient ID
+function getRecipientIdFromElement(element) {
+  const identifier = element.id;
   if (identifier == null) {
     return null;
   }
@@ -98,61 +94,82 @@ const products = {
     return this.details.filter((x) => x.recipient === recipientId);
   }
 };
-let recipients = [];
+const recipients = {
+  ids: [],
+  indexOf(id) {
+    return this.ids.findIndex((x) => x === id);
+  },
+  isEmpty() {
+    return this.ids.length === 0;
+  }
+};
 const codes = new Set();
 
 // Details
 let productsOrderable;
 
 /* DISPLAY FUNCTIONS */
-// Reveal Purchaser/Delivery Details if hidden
-function showPurchaserDetails() {
-  if (!$('#purchaser-details').is(':visible')) {
-    $('#purchaser-details, #delivery-details').show(animationTime);
+// Show a hidden Element
+function show(ids) {
+  const elements = document.querySelectorAll(ids);
+  for (let i = 0; i < elements.length; i += 1) {
+    elements[i].classList.remove('hidden');
+    elements[i].classList.add('visible');
   }
+}
+
+// Hide an Element
+function hide(ids) {
+  const elements = document.querySelectorAll(ids);
+  for (let i = 0; i < elements.length; i += 1) {
+    elements[i].classList.remove('visible');
+    elements[i].classList.add('hidden');
+  }
+}
+
+function isVisible(element) {
+  const parent = element.closest('.hideable');
+  return parent.classList.contains('visible');
 }
 
 // Reveal correct delivery elements
 function showDeliveryElement(type) {
-  const defer = $.Deferred();
-  const collection = type === 'collection'
-    ? $('#user-collection').show(animationTime)
-    : $('#user-collection').hide(animationTime);
+  switch (type) {
+    case 'delivery':
+      show(['#user-delivery']);
+      hide(['#user-collection', '#split-delivery-buttons', 'fieldset[id^="recipient"']);
+      break;
 
-  const delivery = type === 'delivery'
-    ? $('#user-delivery').show(animationTime)
-    : $('#user-delivery').hide(animationTime);
+    case 'split-delivery':
+      show(['#split-delivery-buttons', 'fieldset[id^="recipient"']);
+      hide(['#user-collection', '#user-delivery']);
+      break;
 
-  const splitDelivery = type === 'split-delivery'
-    ? $('#split-delivery-buttons').show(animationTime)
-    : $('#split-delivery-buttons').hide(animationTime);
-
-  const splitDeliveryRecipients = type === 'split-delivery'
-    ? $('fieldset[id^=recipient').show(animationTime)
-    : $('fieldset[id^=recipient').hide(animationTime);
-
-  $.when(collection, delivery, splitDelivery, splitDeliveryRecipients).done(() => {
-    defer.resolve();
-  });
-  return defer;
+    case 'collection':
+    default:
+      show(['#user-collection']);
+      hide(['#user-delivery', '#split-delivery-buttons', 'fieldset[id^="recipient"']);
+      break;
+  }
 }
 
 // Update Price
 function updatePrice() {
   const delivery = [0, 0, 0, 0];
-  if (!$('#collection').is(':checked')) {
-    $('input[id^=zone]').each(function callback() {
-      const recipientId = getRecipientIdFromSelector($(this));
+  if (!document.getElementById('collection').checked) {
+    const elements = document.querySelectorAll('input[id^="zone"]');
+    for (let i = 0; i < elements.length; i += 1) {
+      const recipientId = getRecipientIdFromElement(elements[i]);
       const inputIdSelector = recipientId != null
-        ? $(`#address-${recipientId}`)
-        : $('#address');
-      if (inputIdSelector.is(':visible') && inputIdSelector.hasClass('is-valid')) {
-        const zone = parseInt($(this).val(), 10);
+        ? document.getElementById(`address-${recipientId}`)
+        : document.getElementById('address');
+      if (isVisible(inputIdSelector) && inputIdSelector.classList.contains('is-valid')) {
+        const zone = parseInt(elements[i].value, 10);
         if (zone >= 0 && zone <= 3) {
           delivery[zone] += 1;
         }
       }
-    });
+    }
   }
 
   fetch(`${managementBaseUrl}/treatbox/lookupprice`, {
@@ -168,14 +185,17 @@ function updatePrice() {
   }).then((response) => response.json())
     .then((data) => {
       if (data.status === 'OK') {
-        $('#food-cost').text(priceFormat(data.bottomLine.foodCost));
-        $('#food-moms').text(priceFormat(data.bottomLine.foodMoms, { includeOre: true }));
-        $('#delivery-cost').text(priceFormat(data.bottomLine.deliveryCost));
-        $('#delivery-moms').text(priceFormat(data.bottomLine.deliveryMoms, { includeOre: true }));
-        $('#total-cost').text(priceFormat(data.bottomLine.total));
+        document.getElementById('food-cost').innerHTML = priceFormat(data.bottomLine.foodCost);
+        document.getElementById('food-moms').innerHTML = priceFormat(data.bottomLine.foodMoms, { includeOre: true });
+        document.getElementById('delivery-cost').innerHTML = priceFormat(data.bottomLine.deliveryCost);
+        document.getElementById('delivery-moms').innerHTML = priceFormat(data.bottomLine.deliveryMoms, { includeOre: true });
+        document.getElementById('total-cost').innerHTML = priceFormat(data.bottomLine.total);
         data.delivery.forEach((zone) => {
           const price = zone.price !== 0 ? priceFormat(zone.price) : 'Free';
-          $(`.zone${zone.zone}-surcharge-amount`).text(price);
+          const elements = document.getElementsByClassName(`zone${zone.zone}-surcharge-amount`);
+          for (let i = 0; i < elements.length; i += 1) {
+            elements[i].innerHTML = price;
+          }
         });
       }
     });
@@ -261,7 +281,7 @@ function setUpAddressDropdown(recipientId) {
 }
 
 function updateTextAreas() {
-  recipients.forEach((recipient) => {
+  recipients.ids.forEach((recipient) => {
     const recipientsItems = products.details
       .filter((x) => x.recipient === recipient)
       .map((x) => x.name)
@@ -278,8 +298,8 @@ function updateTextAreas() {
 
 function setAddRemoveRecipientStatus() {
   const unassignedItems = products.details.filter((x) => x.recipient === null).length;
-  let assigned = recipients.length;
-  recipients.forEach((recipient) => {
+  let assigned = recipients.ids.length;
+  recipients.ids.forEach((recipient) => {
     const recipientHasItems = products.details
       .filter((x) => x.recipient === recipient).length > 0;
     if (recipientHasItems) {
@@ -294,7 +314,7 @@ function setAddRemoveRecipientStatus() {
 
 // Function to create button row for selecting items for each recipient
 function updateButtonRow() {
-  recipients.forEach((recipient) => {
+  recipients.ids.forEach((recipient) => {
     // Render Buttons
     const buttons = [];
     products.details.forEach((item, index) => {
@@ -338,8 +358,8 @@ function removeRecipient(id) {
   });
 
   document.getElementById(`recipient-${id}`).remove();
-  recipients.splice(recipients.findIndex((x) => x === id), 1);
-  document.getElementById('recipients').value = JSON.stringify(recipients);
+  recipients.ids.splice(recipients.indexOf(id), 1);
+  document.getElementById('recipients').value = JSON.stringify(recipients.ids);
 
   updatePrice();
   updateButtonRow();
@@ -347,15 +367,19 @@ function removeRecipient(id) {
 }
 
 function addNewRecipient() {
-  const id = recipients.length > 0
-    ? recipients[recipients.length - 1] + 1
+  const id = recipients.ids.length > 0
+    ? recipients.ids[recipients.ids.length - 1] + 1
     : 0;
-  recipients.push(id);
-  document.getElementById('recipients').value = JSON.stringify(recipients);
+  recipients.ids.push(id);
+  document.getElementById('recipients').value = JSON.stringify(recipients.ids);
 
-  const newRecipient = ejs.render(templates.newrecipient, { id });
+  const template = document.createElement('template');
+  template.innerHTML = ejs.render(templates.newrecipient, { id });
 
-  $(newRecipient).insertBefore('#submit-fieldset').hide().show(animationTime);
+  const parentNode = document.getElementById('treatbox-form');
+  const newNode = template.content.firstChild;
+  parentNode.insertBefore(newNode, document.getElementById('submit-fieldset'));
+  show(`#${newNode.id}`);
   updateButtonRow();
   setAddRemoveRecipientStatus();
 
@@ -367,60 +391,77 @@ function addNewRecipient() {
   });
 
   // Validate Name
-  $(`#name-${id}`).focusout(function callback() {
-    validateInput($(this).attr('id'));
-    $(`.recipient-legend-name-${id}`).text($(this).val());
+  document.getElementById(`name-${id}`).addEventListener('focusout', (event) => {
+    validateInput(event.target.id);
+    const elements = document.getElementsByClassName(`recipient-legend-name-${id}`);
+    for (let i = 0; i < elements.length; i += 1) {
+      elements[i].innerHTML = event.target.value;
+    }
   });
 
   // Validate Telephone Number
-  $(`#telephone-${id}`).focusout(function callback() {
-    validateInput($(this).attr('id'));
+  document.getElementById(`telephone-${id}`).addEventListener('focusout', (event) => {
+    validateInput(event.target.id);
   });
 
   // Address
   setUpAddressDropdown(id);
-  $(`#address-${id}`).focusout(() => validateGoogleAddress(id));
+  document.getElementById(`address-${id}`).addEventListener('focusout', () => {
+    validateGoogleAddress(id);
+  });
 }
 
 function validateAllInputs() {
   let valid = true;
-  $('input[id^=name], input[id^=email], input[id^=telephone], textarea[id^=items-to-deliver]').each(function callback() {
-    if ($(this).is(':visible')) {
-      valid = validateInput($(this).attr('id')) && valid;
+  const elementsToValidate = [
+    'input[id^="name"]',
+    'input[id^="email"]',
+    'input[id^="telephone"]',
+    'textarea[id^="items-to-deliver"]',
+    'input[id^="address"]'
+  ];
+  const elements = document.querySelectorAll(elementsToValidate);
+  for (let i = 0; i < elements.length; i += 1) {
+    if (isVisible(elements[i])) {
+      const { field, id } = getDetailsFromMongoId(elements[i].id);
+      valid = field === 'address'
+        ? validateGoogleAddress(id) && valid
+        : validateInput(elements[i].id) && valid;
     }
-  });
-  $('input[id^=address]').each(function callback() {
-    if ($(this).is(':visible')) {
-      const { id } = getDetailsFromMongoId($(this).attr('id'));
-      valid = validateGoogleAddress(id) && valid;
-    }
-  });
+  }
   return valid;
 }
 
 function touchAllAddresses() {
-  $('input[id^=address]').focusout();
+  const elements = document.querySelectorAll('input[id^="address"]');
+  for (let i = 0; i < elements.length; i += 1) {
+    elements[i].dispatchEvent(new Event('focusin'));
+    elements[i].dispatchEvent(new Event('focusout'));
+  }
 }
 
 async function lookupRebateCode(code) {
-  const data = await $.ajax({
-    method: 'get',
-    url: `${managementBaseUrl}/treatbox/lookuprebate`,
-    data: {
-      code
-    }
+  const response = await fetch(`${managementBaseUrl}/treatbox/lookuprebate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ code })
   });
+  const data = await response.json();
   if (data.valid) {
     switch (data.code.type) {
-      case 'zone3delivery':
-        $('select[id^=quantity-]').each(function callback() {
-          if ($(this).attr('data-deliverable-zone') === '2') {
-            $(this).attr('data-deliverable-zone', '3');
+      case 'zone3delivery': {
+        const elements = document.querySelectorAll('select[id^="quantity-"]');
+        for (let i = 0; i < elements.length; i += 1) {
+          if (elements[i].getAttribute('data-deliverable-zone') === '2') {
+            elements[i].setAttribute('data-deliverable-zone', '3');
           }
-        });
+        }
         products.update();
         touchAllAddresses();
         break;
+      }
 
       case 'costprice':
         updatePrice();
@@ -443,7 +484,7 @@ function updateProductAvailability() {
     } else {
       if (element.value > 0) {
         element.value = 0;
-        $(`#quantity-${id}`).trigger('change');
+        document.getElementById(`quantity-${id}`).dispatchEvent(new Event('change'));
       }
       element.disabled = true;
     }
@@ -465,101 +506,134 @@ document.addEventListener('google-api-loaded', () => {
   productsOrderable = window.orderable;
 
   // Update product availability when date changed
-  $('#date').change(updateProductAvailability);
+  document.getElementById('date').addEventListener('change', () => {
+    updateProductAvailability();
+  });
 
   // Select Items
-  $('select[id^=quantity-]').change(() => {
-    products.update();
-    updateButtonRow();
-    setAddRemoveRecipientStatus();
-    showPurchaserDetails();
-    touchAllAddresses();
-  });
+  const quantityElements = document.querySelectorAll('select[id^="quantity-"]');
+  for (let i = 0; i < quantityElements.length; i += 1) {
+    quantityElements[i].addEventListener('change', () => {
+      products.update();
+      updateButtonRow();
+      setAddRemoveRecipientStatus();
+      show(['#purchaser-details', '#delivery-details']);
+      touchAllAddresses();
+    });
+  }
 
   // Validate User Details as they are entered
-  $('input[id^=name]').focusout(function callback() {
-    // Update Legend Title if split delivery recipient
-    const id = getRecipientIdFromSelector($(this));
-    if (id != null) {
-      const index = recipients.findIndex((x) => x === id);
-      const name = $(this).val() === '' ? `Recipient ${index + 1}` : $(this).val();
-      $(`.recipient-legend-name-${id}`).text(name);
-    }
+  const nameElements = document.querySelectorAll('input[id^="name"]');
+  for (let i = 0; i < nameElements.length; i += 1) {
+    nameElements[i].addEventListener('focusout', (event) => {
+      // Update Legend Title if split delivery recipient
+      const id = getRecipientIdFromElement(event.target);
+      if (id != null) {
+        const index = recipients.indexOf(id);
+        const name = event.target.value === '' ? `Recipient ${index + 1}` : event.target.value;
+        const legendNames = document.getElementsByClassName(`recipient-legend-name-${id}`);
+        for (let j = 0; j < legendNames.length; j += 1) {
+          legendNames[j].innerHTML = name;
+        }
+      }
 
-    // Validate Input
-    validateInput($(this).attr('id'));
-  });
-  $('input[id^=email], input[id^=telephone]').focusout(function callback() {
-    validateInput($(this).attr('id'));
-  });
+      // Validate Input
+      validateInput(event.target.id);
+    });
+  }
+  const contactElements = document.querySelectorAll(['input[id^="email"]', 'input[id^="telephone"]']);
+  for (let i = 0; i < contactElements.length; i += 1) {
+    contactElements[i].addEventListener('focusout', (event) => {
+      validateInput(event.target.id);
+    });
+  }
 
   // Delivery Type
-  $('#delivery, #collection, #split-delivery').click(function callback() {
-    const id = $(this).attr('id');
-    showDeliveryElement(id).done(() => {
+  const deliveryButtons = document.querySelectorAll('#delivery, #collection, #split-delivery');
+  for (let i = 0; i < deliveryButtons.length; i += 1) {
+    deliveryButtons[i].addEventListener('click', () => {
+      const { id } = deliveryButtons[i];
+      showDeliveryElement(id);
       updatePrice();
+      if (id === 'split-delivery' && recipients.isEmpty()) {
+        addNewRecipient();
+      }
     });
-    if (id === 'split-delivery' && recipients.length === 0) {
+  }
+
+  // Address
+  const addressInputs = document.querySelectorAll('input[id^="address"]');
+  for (let i = 0; i < addressInputs.length; i += 1) {
+    const id = getRecipientIdFromElement(addressInputs[i]);
+    setUpAddressDropdown(id);
+    addressInputs[i].addEventListener('focusout', () => {
+      validateGoogleAddress(id);
+    });
+  }
+
+  // Set up Add/Remove Recipient Buttons
+  const addRecipientButtons = document.getElementsByClassName('add-recipient');
+  for (let i = 0; i < addRecipientButtons.length; i += 1) {
+    addRecipientButtons[i].addEventListener('click', () => {
       addNewRecipient();
+    });
+  }
+  const removeRecipientButtons = document.getElementsByClassName('removerecipient');
+  for (let i = 0; i < removeRecipientButtons.length; i += 1) {
+    const id = getRecipientIdFromElement(removeRecipientButtons[i]);
+    removeRecipientButtons[i].addEventListener('click', () => {
+      removeRecipient(id);
+    });
+  }
+
+  // Validate All when Submit Pressed
+  const submitButton = document.getElementById('form-validate');
+  submitButton.addEventListener('click', (event) => {
+    if (!validateAllInputs()) {
+      event.preventDefault();
     }
   });
 
-  // Address
-  $('input[id^=address]').each(function callback() {
-    const id = getRecipientIdFromSelector($(this));
-    setUpAddressDropdown(id);
-    $(this).focusout(() => validateGoogleAddress(id));
-  });
-
-  // Set up Add Recipient Button
-  $('.add-recipient').click(() => {
-    addNewRecipient();
-  });
-  $('.removerecipient').each(function callback() {
-    const id = getRecipientIdFromSelector($(this));
-    $(this).click(() => {
-      removeRecipient(id);
-    });
-  });
-
-  // Validate All when Submit Pressed
-  $('.form-validate').click(() => validateAllInputs());
-
   // Apply Rebate Code
-  $('#rebate-apply').click(() => {
-    const code = $('#rebate-entry').val();
+  document.getElementById('rebate-apply').addEventListener('click', () => {
+    const rebateMessage = document.getElementById('rebate-message');
+    const code = document.getElementById('rebate-entry').value;
     lookupRebateCode(code).then((data) => {
       if (data.valid) {
         codes.add(data.code.value);
-        $('#rebate-codes').val(JSON.stringify(Array.from(codes)));
-        $('#rebate-message').text('Code Applied!');
+        document.getElementById('rebate-codes').value = JSON.stringify(Array.from(codes));
+        rebateMessage.innerHTML = 'Code Applied!';
         updatePrice();
       } else {
-        $('#rebate-message').text('Invalid Code');
+        rebateMessage.innerHTML = 'Invalid Code';
       }
     }).catch(() => {
-      $('#rebate-message').text('There was an error looking up your code');
+      rebateMessage.innerHTML = 'There was an error looking up your code';
     });
   });
 
   // Hide Loading Spinner and Show Page
-  $('#date').trigger('change');
-  $('#loading-div').hide(animationTime);
-  $('#date-selector, #product-selector, #submit-fieldset').show(animationTime);
+  document.getElementById('date').dispatchEvent(new Event('change'));
+  hide(['#loading-div']);
+  show(['#date-selector', '#product-selector', '#submit-fieldset']);
 
   // Check if form is posted
   if (window.post) {
     if (window.deliveryType === 'split-delivery') {
-      products.details = JSON.parse($('#items').val());
-      recipients = JSON.parse($('#recipients').val());
+      products.details = JSON.parse(document.getElementById('items').value);
+      recipients.ids = JSON.parse(document.getElementById('recipients').value);
       updateButtonRow();
       updateTextAreas();
       setAddRemoveRecipientStatus();
     }
-    $('select[id^=quantity-]:first').trigger('change');
-    $(`input[name=delivery-type][value=${window.deliveryType}]`).click();
-    if ($('#rebate-codes').val() !== '') {
-      const codesToApply = JSON.parse($('#rebate-codes').val());
+    document.querySelectorAll('select[id^="quantity-"]')[0].dispatchEvent(new Event('change'));
+
+    const selectedRadio = document.querySelectorAll(`input[name="delivery-type"][value="${window.deliveryType}"]`)[0];
+    selectedRadio.dispatchEvent(new MouseEvent('click'));
+
+    const rebateCodes = document.getElementById('rebate-codes');
+    if (rebateCodes.value !== '') {
+      const codesToApply = JSON.parse(rebateCodes.value);
       codesToApply.forEach((code) => {
         codes.add(code);
         lookupRebateCode(code);

@@ -542,16 +542,8 @@ legend {
   margin: 5px 5px;
 }
 
-#split-delivery-buttons {
-  display: none;
-}
-
 label {
   text-align: right;
-}
-
-#user-delivery {
-  display: none;
 }
 
 #delivery-type {
@@ -584,8 +576,20 @@ select {
   font-style: italic;
 }
 
-#date-selector, #product-selector, #purchaser-details, #delivery-details, #submit-fieldset {
-  display: none;
+.visible {
+  transform-origin: left top;
+  transform: scaleY(1);
+  transition: visibility 0s, transform 0.4s;
+}
+
+.hidden {
+  transform-origin: left top;
+  transform: scaleY(0);
+  overflow: hidden;
+  height: 0;
+  padding: 0;
+  margin: 0;
+  transition: visibility 0.4s, transform 0.4s;
 }
 
 #loading-div {

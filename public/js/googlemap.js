@@ -67,10 +67,11 @@ function initMap() {
   map.setMapTypeId('styled_map');
 
   // Add marker
-  /* eslint-disable-next-line no-unused-vars */
   const marker = new google.maps.Marker({
     position: address,
-    icon: { url: 'https://maps.google.com/mapfiles/ms/icons/pink-dot.png' },
+    icon: {
+      url: 'https://maps.google.com/mapfiles/ms/icons/pink-dot.png'
+    },
     map
   });
 }

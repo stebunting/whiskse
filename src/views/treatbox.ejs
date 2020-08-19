@@ -52,7 +52,7 @@
 
   <!-- Form -->
   <form method="post" data-validation="true" id="treatbox-form" autocomplete="off">
-    <fieldset class="form-group" id="date-selector">
+    <fieldset class="form-group hideable hidden" id="date-selector">
       <legend>When do you want to order for?</legend>
       <div class="form-group row">
         <div class="col-sm-10 offset-md-1 form-group">
@@ -70,7 +70,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="form-group" id="product-selector">
+    <fieldset class="form-group hideable hidden" id="product-selector">
       <legend>What would you like to buy?</legend><%
 
       for (const product of Object.values(apiResponse.products)) { %>
@@ -89,7 +89,7 @@
         } %>
     </fieldset>
 
-    <fieldset class="form-group" id="purchaser-details">
+    <fieldset class="form-group hideable hidden" id="purchaser-details">
       <legend>Your details</legend>
       
       <div class="form-group row">
@@ -114,7 +114,7 @@
       </div>
     </fieldset>
 
-    <fieldset class="form-group" id="delivery-details">
+    <fieldset class="form-group hideable hidden" id="delivery-details">
       <legend>Delivery</legend>
 
       <div class="row">
@@ -135,7 +135,7 @@
         </div>
       </div>
       
-      <div id="user-collection">
+      <div class="hideable visible" id="user-collection">
         <div class="form-group row">
           <label for="collection-notes" class="col-sm-4 col-form-label">Notes</label>
           <div class="col-sm-6">
@@ -144,7 +144,7 @@
         </div>
       </div>
 
-      <div id="user-delivery">
+      <div class="hideable hidden" id="user-delivery">
         <div class="form-group row">
           <label for="address" class="col-sm-4 col-form-label">Address</label>
           <div class="col-sm-6">
@@ -163,7 +163,7 @@
         </div>
       </div>
 
-      <div id="split-delivery-buttons">
+      <div class="hideable hidden" id="split-delivery-buttons">
         <div class="form-group row">
           <div class="col-sm-6 offset-md-4">
             <button type="button" class="btn btn-success item-button add-recipient" id="add-recipient" name="add-recipient">Add Recipient</button>
@@ -175,7 +175,7 @@
         const recipients = JSON.parse(body['recipients']);
         recipients.forEach((id, index) => { %>
 
-    <fieldset class="form-group" id="recipient-<%=id %>">
+    <fieldset class="form-group hideable hidden" id="recipient-<%=id %>">
       <legend class="recipient-legend-name-<%=id %>"></legend>
 
       <div class="form-group row">
@@ -239,7 +239,7 @@
     }
     %>
 
-    <fieldset id="submit-fieldset">
+    <fieldset class="hideable hidden" id="submit-fieldset">
       <legend>Summary</legend>
 
       <div class="form-group row" id="rebate-entry-div">
@@ -288,7 +288,7 @@
           <input type="hidden" name="callback-url" value="<%=confirmationUrl %>">
           <input type="hidden" id="recipients" name="recipients" value="<%=body['recipients'] %>">
           <input type="hidden" id="items" name="items" value="<%=body['items'] %>">
-          <button class="btn btn-primary form-validate" type="submit" formaction="<%=formSubmitUrl %>">Check and Confirm</button>
+          <button id="form-validate" class="btn btn-primary form-validate" type="submit" formaction="<%=formSubmitUrl %>">Check and Confirm</button>
         </div>
       </div>
     </fieldset>

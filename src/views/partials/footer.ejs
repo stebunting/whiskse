@@ -43,29 +43,34 @@
 
 <!-- Dependencies -->
 <script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
 <script src="/js/ejs.min.js"></script>
 
 <!-- Whisk JS -->
 <script src="/js/instagram.js"></script><%
 
-if (page === 'treatbox') { %>
+switch (page) {
+  case 'treatbox': %>
 <script src="/js/form-verification.js"></script>
 <script src="/js/boundaries.js"></script>
 <script src="/js/treatbox.js"></script><%
+    break;
 
-} else if (page === 'treatboxconfirm') { %>
+  case 'treatboxconfirm': %>
 <script src="/js/treatbox-confirm.js"></script><%
+    break;
 
-} else if (page === 'menu') { %>
+  case 'menu': %>
 <script src="/js/menu.js"></script><%
+    break;
+  
+  default:
+    break;
 } %>
 
 <!-- Google Maps JS -->
 <script src="/js/googlemap.js"></script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%=googleApiKey %>&libraries=places,geometry&callback=initMap"></script>
-
-<!-- Bootstrap Required JS -->
-<script src="/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

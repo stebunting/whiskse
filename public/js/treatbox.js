@@ -1,7 +1,7 @@
 /* global google, ejs, validateInput, setValid, initialiseBoundaries, getZone */
 // Constants
-const managementBaseUrl = 'http://localhost:5000';
-// const managementBaseUrl = 'https://whisk-management.herokuapp.com';
+// const managementBaseUrl = 'http://localhost:5000';
+const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const templates = {
   buttonRow: `<% buttons.forEach((button) => { %>
 <button type="button" class="btn <%

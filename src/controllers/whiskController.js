@@ -24,17 +24,31 @@ function whiskController() {
       }
     }
 
-    // Get Delivery Information
-    const delivery = [0, 0, 0, 0];
-    if (postData['delivery-type'] === 'delivery') {
-      const zone = parseInt(postData.zone, 10);
-      delivery[zone] += 1;
-    } else if (postData['delivery-type'] === 'split-delivery') {
-      Object.entries(postData).forEach((entry) => {
-        if (entry[0].startsWith('zone-')) {
-          const zone = parseInt(entry[1], 10);
-          delivery[zone] += 1;
-        }
+    // Get recipient Information
+    const recipients = [];
+    if (postData['delivery-type'] !== 'collection') {
+      const recipientArray = postData['delivery-type'] === 'delivery'
+        ? [null]
+        : JSON.parse(postData.recipients);
+      const items = JSON.parse(postData.items);
+      recipientArray.forEach((recipient) => {
+        const idPostfix = recipient !== null ? `-${recipient}` : '';
+        const myItems = items
+          .filter((x) => x.recipient === recipient)
+          .reduce((total, product) => {
+            const newTotal = total;
+            newTotal[product.id] = (newTotal[product.id] || 0) + 1;
+            return newTotal;
+          }, {});
+        const products = Object.keys(myItems).map((id) => ({
+          id,
+          quantity: myItems[id]
+        }));
+        recipients.push({
+          id: recipient,
+          zone: parseInt(postData[`zone${idPostfix}`], 10),
+          products
+        });
       });
     }
 
@@ -43,7 +57,7 @@ function whiskController() {
       url: `${managementBaseUrl}/treatbox/lookupprice`,
       data: {
         basket,
-        delivery,
+        recipients,
         codes: postData['rebate-codes']
       }
     };

@@ -1,7 +1,7 @@
 /* global google, ejs, validateInput, setValid, initialiseBoundaries, getZone */
 // Constants
-// const managementBaseUrl = 'http://localhost:5000';
-const managementBaseUrl = 'https://whisk-management.herokuapp.com';
+const managementBaseUrl = 'http://localhost:5000';
+// const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const templates = {
   buttonRow: `<% buttons.forEach((button) => { %>
 <button type="button" class="btn <%
@@ -25,24 +25,19 @@ function getNamePostfix(id) {
   return id != null && id !== '' ? `-${id}` : '';
 }
 
-// Splits identifier into field and MongoDB ID`
-function getDetailsFromMongoId(htmlId) {
+// Splits identifier into field and recipient ID
+function getDetailsFromHtmlId(htmlId, options = {}) {
   if (htmlId == null) {
     return { field: undefined, id: undefined };
   }
-  const array = htmlId.split('-');
-  const [field, id] = array;
-  return { field, id };
-}
-
-// Splits element identifier into field and recipient ID
-function getRecipientIdFromElement(element) {
-  const identifier = element.id;
-  if (identifier == null) {
-    return null;
-  }
-  const [, id] = identifier.split('-');
-  return id != null ? parseInt(id, 10) : null;
+  let [field, id] = htmlId.split('-');
+  const numberId = parseInt(id, 10);
+  id = Number.isNaN(numberId) || options.noConvert === true ? id : numberId;
+  id = id == null ? null : id;
+  return {
+    field,
+    id
+  };
 }
 
 // Format number-type price in öre to user-viewable amount
@@ -66,7 +61,7 @@ const products = {
     const quantities = document.querySelectorAll('*[id^="quantity-"]');
     quantities.forEach((element) => {
       const quantity = parseInt(element.value, 10);
-      const { id } = getDetailsFromMongoId(element.id);
+      const { id } = getDetailsFromHtmlId(element.id, { noConvert: true });
       const name = element.getAttribute('data-name');
       const zone = parseInt(element.getAttribute('data-deliverable-zone'), 10);
       if (quantity > 0) {
@@ -94,15 +89,56 @@ const products = {
     return this.details.filter((x) => x.recipient === recipientId);
   }
 };
+
+// List of Recipients
 const recipients = {
+  element: document.getElementById('recipients'),
   ids: [],
+  recipients: [],
   indexOf(id) {
     return this.ids.findIndex((x) => x === id);
   },
   isEmpty() {
     return this.ids.length === 0;
+  },
+  addNew() {
+    const id = !this.isEmpty()
+      ? this.ids[this.ids.length - 1] + 1
+      : 0;
+    this.ids.push(id);
+    return id;
+  },
+  update() {
+    // If purchaser is recipient, set id array to null
+    const idArray = this.ids.length === 0 ? [null] : this.ids;
+
+    // Create recipients array for lookupPrice API
+    this.recipients = idArray.map((recipientId) => {
+      const count = products.for(recipientId).reduce((total, product) => {
+        const newTotal = total;
+        newTotal[product.id] = (newTotal[product.id] || 0) + 1;
+        return newTotal;
+      }, {});
+      const productQuantities = Object.keys(count).map((productId) => ({
+        id: productId,
+        quantity: count[productId]
+      }));
+      return {
+        id: recipientId,
+        zone: parseInt(document.getElementById(`zone${getNamePostfix(recipientId)}`).value, 10),
+        products: productQuantities
+      };
+    });
+  },
+  sendToBody() {
+    this.element.value = JSON.stringify(this.ids);
+  },
+  getFromBody() {
+    this.ids = JSON.parse(this.element.value);
   }
 };
+
+// List of Rebate Codes
 const codes = new Set();
 
 // Details
@@ -153,25 +189,45 @@ function showDeliveryElement(type) {
   }
 }
 
+function setAddressMessages(data) {
+  const addresses = document.querySelectorAll('input[id^="address"]');
+  for (let i = 0; i < addresses.length; i += 1) {
+    const { id } = getDetailsFromHtmlId(addresses[i].id);
+    const deliveryInfo = data.filter((x) => x.recipientId === id)[0] || {};
+    const invalid = addresses[i].classList.contains('is-invalid');
+    const namePostfix = getNamePostfix(id);
+    const zone = parseInt(document.getElementById(`zone${namePostfix}`).value, 10);
+    const message = [];
+    switch (zone) {
+      case 0:
+        message.push('Local');
+        break;
+
+      case 1:
+      case 2:
+      case 3:
+        message.push(`Zone ${zone}`);
+        break;
+
+      default:
+        break;
+    }
+    if (invalid && zone === -1) {
+      message.push('Invalid Address');
+    } else if (invalid) {
+      message.push('Delivery Not Available');
+    } else if (deliveryInfo.price === 0) {
+      message.push('Free Delivery');
+    } else if (deliveryInfo.price > 0) {
+      message.push(`${priceFormat(deliveryInfo.price)} Delivery`);
+    }
+    document.getElementById(`message-address${namePostfix}`).innerHTML = message.join(' // ');
+  }
+}
+
 // Update Price
 function updatePrice() {
-  const delivery = [0, 0, 0, 0];
-  if (!document.getElementById('collection').checked) {
-    const elements = document.querySelectorAll('input[id^="zone"]');
-    for (let i = 0; i < elements.length; i += 1) {
-      const recipientId = getRecipientIdFromElement(elements[i]);
-      const inputIdSelector = recipientId != null
-        ? document.getElementById(`address-${recipientId}`)
-        : document.getElementById('address');
-      if (isVisible(inputIdSelector) && inputIdSelector.classList.contains('is-valid')) {
-        const zone = parseInt(elements[i].value, 10);
-        if (zone >= 0 && zone <= 3) {
-          delivery[zone] += 1;
-        }
-      }
-    }
-  }
-
+  recipients.update();
   fetch(`${managementBaseUrl}/treatbox/lookupprice`, {
     method: 'POST',
     headers: {
@@ -179,7 +235,7 @@ function updatePrice() {
     },
     body: JSON.stringify({
       basket: products.basket,
-      delivery,
+      recipients: recipients.recipients,
       codes: Array.from(codes)
     })
   }).then((response) => response.json())
@@ -190,13 +246,7 @@ function updatePrice() {
         document.getElementById('delivery-cost').innerHTML = priceFormat(data.bottomLine.deliveryCost);
         document.getElementById('delivery-moms').innerHTML = priceFormat(data.bottomLine.deliveryMoms, { includeOre: true });
         document.getElementById('total-cost').innerHTML = priceFormat(data.bottomLine.total);
-        data.delivery.forEach((zone) => {
-          const price = zone.price !== 0 ? priceFormat(zone.price) : 'Free';
-          const elements = document.getElementsByClassName(`zone${zone.zone}-surcharge-amount`);
-          for (let i = 0; i < elements.length; i += 1) {
-            elements[i].innerHTML = price;
-          }
-        });
+        setAddressMessages(data.delivery);
       }
     });
 }
@@ -211,35 +261,22 @@ function validateGoogleAddress(recipientId, options = {}) {
   const zone = parseInt(document.getElementById(`zone${namePostfix}`).value, 10);
 
   let valid = true;
-  const message = [];
 
   if (options.allowBlank !== false && addressToValidate === '') {
     valid = null;
+    document.getElementById(`zone${namePostfix}`).value = -1;
   } else if (addressToValidate === '' || googleAddress !== addressToValidate || Number.isNaN(zone)) {
-    message.push('Invalid Address, please select from dropdown menu');
     valid = false;
+    document.getElementById(`zone${namePostfix}`).value = -1;
   } else {
     const usersItems = products.for(recipientId);
     const highestZone = usersItems.length > 0
       ? usersItems.map((x) => x.zone).reduce((a, b) => Math.max(a, b))
       : 2;
     valid = highestZone >= zone;
-
-    if (zone === 0) {
-      message.push('Local');
-    } else {
-      message.push(`Zone ${zone}`);
-    }
-
-    if (valid) {
-      message.push(`<span class="zone${zone}-surcharge-amount">Free</span> Delivery`);
-    } else {
-      message.push('Delivery not available');
-    }
   }
 
   setValid(element, valid);
-  document.getElementById(`message-address${namePostfix}`).innerHTML = message.join(' // ');
   updatePrice();
 
   return valid;
@@ -274,9 +311,15 @@ function setUpAddressDropdown(recipientId) {
 
   // Enter key should select Autocomplete item when list is open
   document.getElementById(`address${namePostfix}`).addEventListener('keydown', (event) => {
-    const pacContainer = document.getElementsByClassName('pac-container');
-    const pacContainerVisible = window.getComputedStyle(pacContainer[0]).display !== 'none';
-    return !(event.which === 13 && pacContainerVisible);
+    const pacContainers = Array.from(document.getElementsByClassName('pac-container'));
+    const pacContainerVisible = pacContainers.reduce((visible, pacContainer) => (
+      window.getComputedStyle(pacContainer).display !== 'none' || visible
+    ), false);
+    if (event.which === 13 && pacContainerVisible) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
   });
 }
 
@@ -286,29 +329,32 @@ function updateTextAreas() {
       .filter((x) => x.recipient === recipient)
       .map((x) => x.name)
       .sort();
-    const counts = {};
-    recipientsItems.forEach((item) => {
-      counts[item] = (counts[item] || 0) + 1;
-    });
+    const counts = recipientsItems.reduce((total, item) => {
+      const updatedTotal = total;
+      updatedTotal[item] = (updatedTotal[item] || 0) + 1;
+      return updatedTotal;
+    }, {});
     const listItemsArray = Object.entries(counts).map((x) => `${x[1]} x ${x[0]}`);
     const listItems = listItemsArray.length > 0 ? listItemsArray.join(', ') : 'Select items from above';
     document.getElementById(`items-to-deliver-${recipient}`).value = listItems;
   });
 }
 
+// Function to set 'Add New Recipient' button enabled or disabled
 function setAddRemoveRecipientStatus() {
-  const unassignedItems = products.details.filter((x) => x.recipient === null).length;
-  let assigned = recipients.ids.length;
-  recipients.ids.forEach((recipient) => {
-    const recipientHasItems = products.details
-      .filter((x) => x.recipient === recipient).length > 0;
-    if (recipientHasItems) {
-      assigned -= 1;
-    }
-  });
+  // Products not assigned to a recipient
+  const unassignedProducts = products.details.filter((x) => x.recipient === null).length;
+
+  // Products assigned to a recipient
+  const assignedProducts = recipients.ids.reduce((a, b) => (
+    products.for(b).length > 0 ? a - 1 : a
+  ), 0);
+
+  // Disable button if unassigned is equal to assigned plus number of recipients
+  const disabled = unassignedProducts === assignedProducts + recipients.ids.length;
   const buttons = document.getElementsByClassName('add-recipient');
   for (let i = 0; i < buttons.length; i += 1) {
-    buttons[i].disabled = unassignedItems - assigned === 0;
+    buttons[i].disabled = disabled;
   }
 }
 
@@ -359,7 +405,7 @@ function removeRecipient(id) {
 
   document.getElementById(`recipient-${id}`).remove();
   recipients.ids.splice(recipients.indexOf(id), 1);
-  document.getElementById('recipients').value = JSON.stringify(recipients.ids);
+  recipients.sendToBody();
 
   updatePrice();
   updateButtonRow();
@@ -367,11 +413,8 @@ function removeRecipient(id) {
 }
 
 function addNewRecipient() {
-  const id = recipients.ids.length > 0
-    ? recipients.ids[recipients.ids.length - 1] + 1
-    : 0;
-  recipients.ids.push(id);
-  document.getElementById('recipients').value = JSON.stringify(recipients.ids);
+  const id = recipients.addNew();
+  recipients.sendToBody();
 
   const template = document.createElement('template');
   template.innerHTML = ejs.render(templates.newrecipient, { id });
@@ -394,8 +437,9 @@ function addNewRecipient() {
   document.getElementById(`name-${id}`).addEventListener('focusout', (event) => {
     validateInput(event.target.id);
     const elements = document.getElementsByClassName(`recipient-legend-name-${id}`);
+    const legendName = event.target.value !== '' ? event.target.value : 'Recipient';
     for (let i = 0; i < elements.length; i += 1) {
-      elements[i].innerHTML = event.target.value;
+      elements[i].innerHTML = legendName;
     }
   });
 
@@ -423,7 +467,7 @@ function validateAllInputs() {
   const elements = document.querySelectorAll(elementsToValidate);
   for (let i = 0; i < elements.length; i += 1) {
     if (isVisible(elements[i])) {
-      const { field, id } = getDetailsFromMongoId(elements[i].id);
+      const { field, id } = getDetailsFromHtmlId(elements[i].id);
       valid = field === 'address'
         ? validateGoogleAddress(id) && valid
         : validateInput(elements[i].id) && valid;
@@ -527,10 +571,9 @@ document.addEventListener('google-api-loaded', () => {
   for (let i = 0; i < nameElements.length; i += 1) {
     nameElements[i].addEventListener('focusout', (event) => {
       // Update Legend Title if split delivery recipient
-      const id = getRecipientIdFromElement(event.target);
+      const { id } = getDetailsFromHtmlId(event.target.id);
       if (id != null) {
-        const index = recipients.indexOf(id);
-        const name = event.target.value === '' ? `Recipient ${index + 1}` : event.target.value;
+        const name = event.target.value === '' ? 'Recipient' : event.target.value;
         const legendNames = document.getElementsByClassName(`recipient-legend-name-${id}`);
         for (let j = 0; j < legendNames.length; j += 1) {
           legendNames[j].innerHTML = name;
@@ -554,17 +597,17 @@ document.addEventListener('google-api-loaded', () => {
     deliveryButtons[i].addEventListener('click', () => {
       const { id } = deliveryButtons[i];
       showDeliveryElement(id);
-      updatePrice();
       if (id === 'split-delivery' && recipients.isEmpty()) {
         addNewRecipient();
       }
+      updatePrice();
     });
   }
 
   // Address
   const addressInputs = document.querySelectorAll('input[id^="address"]');
   for (let i = 0; i < addressInputs.length; i += 1) {
-    const id = getRecipientIdFromElement(addressInputs[i]);
+    const { id } = getDetailsFromHtmlId(addressInputs[i].id);
     setUpAddressDropdown(id);
     addressInputs[i].addEventListener('focusout', () => {
       validateGoogleAddress(id);
@@ -580,7 +623,7 @@ document.addEventListener('google-api-loaded', () => {
   }
   const removeRecipientButtons = document.getElementsByClassName('removerecipient');
   for (let i = 0; i < removeRecipientButtons.length; i += 1) {
-    const id = getRecipientIdFromElement(removeRecipientButtons[i]);
+    const { id } = getDetailsFromHtmlId(removeRecipientButtons[i].id);
     removeRecipientButtons[i].addEventListener('click', () => {
       removeRecipient(id);
     });
@@ -621,14 +664,14 @@ document.addEventListener('google-api-loaded', () => {
   if (window.post) {
     if (window.deliveryType === 'split-delivery') {
       products.details = JSON.parse(document.getElementById('items').value);
-      recipients.ids = JSON.parse(document.getElementById('recipients').value);
+      recipients.getFromBody();
       updateButtonRow();
       updateTextAreas();
       setAddRemoveRecipientStatus();
     }
-    document.querySelectorAll('select[id^="quantity-"]')[0].dispatchEvent(new Event('change'));
+    document.querySelector('select[id^="quantity-"]').dispatchEvent(new Event('change'));
 
-    const selectedRadio = document.querySelectorAll(`input[name="delivery-type"][value="${window.deliveryType}"]`)[0];
+    const selectedRadio = document.querySelector(`input[name="delivery-type"][value="${window.deliveryType}"]`);
     selectedRadio.dispatchEvent(new MouseEvent('click'));
 
     const rebateCodes = document.getElementById('rebate-codes');

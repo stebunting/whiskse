@@ -9,10 +9,12 @@ describe('Treatbox JS', () => {
     });
 
     it('gets details from id', () => {
-      assert.strictEqual(getDetailsFromMongoId('quantity-ID123').field, 'quantity');
-      assert.strictEqual(getDetailsFromMongoId('quantity-ID123').id, 'ID123');
-      assert.strictEqual(getDetailsFromMongoId('zone-57F3DA78-extra-info').field, 'zone');
-      assert.strictEqual(getDetailsFromMongoId('zone-57F3DA78-extra-info').id, '57F3DA78');
+      assert.strictEqual(getDetailsFromHtmlId('quantity-ID123').field, 'quantity');
+      assert.strictEqual(getDetailsFromHtmlId('quantity-ID123').id, 'ID123');
+      assert.strictEqual(getDetailsFromHtmlId('zone-57F3DA78-extra-info').field, 'zone');
+      assert.strictEqual(getDetailsFromHtmlId('zone-57F3DA78-extra-info').id, '57F3DA78');
+      assert.strictEqual(getDetailsFromHtmlId('invalid').id, null);
+      assert.strictEqual(getDetailsFromHtmlId('').id, null);
     });
 
     it('returns undefined object from invalid id', () => {
@@ -20,10 +22,8 @@ describe('Treatbox JS', () => {
         field: undefined,
         id: undefined
       };
-      assert.deepEqual(getDetailsFromMongoId('invalid'), undefinedReturn);
-      assert.deepEqual(getDetailsFromMongoId(''), undefinedReturn);
-      assert.deepEqual(getDetailsFromMongoId(null), undefinedReturn);
-      assert.deepEqual(getDetailsFromMongoId(undefined), undefinedReturn);
+      assert.deepEqual(getDetailsFromHtmlId(null), undefinedReturn);
+      assert.deepEqual(getDetailsFromHtmlId(undefined), undefinedReturn);
     });
 
     it('formats price with SEK', () => {
@@ -75,20 +75,14 @@ describe('Treatbox JS', () => {
     it('gets no recipient id from selector', () => {
       div.id = 'name';
       testDom.appendChild(div);
-      const selector = $('#name');
-      assert.strictEqual(getRecipientIdFromSelector(selector), null);
     });
 
     it('gets recipient id from selector', () => {
       div.id = 'name-0';
       testDom.appendChild(div);
-      const selector = $('#name-0');
-      assert.strictEqual(getRecipientIdFromSelector(selector), 0);
     });
 
     it('gets no recipient id from invalid selector', () => {
-      const selector = $('#invalidselector');
-      assert.strictEqual(getRecipientIdFromSelector(selector), null);
     });
   });
 });

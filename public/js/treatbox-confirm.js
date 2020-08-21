@@ -1,6 +1,6 @@
 // Constants
-// const managementBaseUrl = 'http://localhost:5000';
-const managementBaseUrl = 'https://whisk-management.herokuapp.com';
+const managementBaseUrl = 'http://localhost:5000';
+// const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 
 // Function to lookup Error Code
 function lookupErrorCode(code) {

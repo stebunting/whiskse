@@ -73,7 +73,8 @@
     <fieldset class="form-group hideable hidden" id="product-selector">
       <legend>What would you like to buy?</legend><%
 
-      for (const product of Object.values(apiResponse.products)) { %>
+      for (const product of Object.values(apiResponse.products)) {
+        product.deliverableZone = product.delivery.reduce((a, zone) => zone.deliverable ? zone.zone : a); %>
       <div class="form-group row">
         <label class="col-sm-4" for="quantity-<%=product._id %>"><%=product.name %></label>
         <div class="col-sm-2 form-group">
@@ -176,7 +177,7 @@
         recipients.forEach((id, index) => { %>
 
     <fieldset class="form-group hideable hidden" id="recipient-<%=id %>">
-      <legend class="recipient-legend-name-<%=id %>"></legend>
+      <legend class="recipient-legend-name-<%=id %>"><%=body[`name-${id}`] %></legend>
 
       <div class="form-group row">
         <label for="buttons" class="col-md-4 col-form-label">Select items to deliver</label>

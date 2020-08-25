@@ -1,3 +1,3 @@
 # Whisk.se
-Node.js comes to Whisk.se
 
+Whisk Website. Node.js.

@@ -3,13 +3,16 @@
   title: 'Whisk Treat Boxes',
   headerDisplay: false
 }); %>
-  <script>
-    window.post = <%
-    if (Object.keys(body).length > 0) {
-      %>true;
-    window.deliveryType = '<%=body['delivery-type'] %>';<%
-    } else { %>false;<%
-    } %>
+  <script><%
+    const amending = Object.keys(body).length > 0; %>
+    window.post = <%=amending %>;
+    window.deliveryType = '<%
+    if (amending) {
+      %><%=body['delivery-type'] %><%
+    } else {
+      %>collection<%
+    } %>';
+
     window.orderable = <%-orderable %>;
   </script>
 

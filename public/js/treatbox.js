@@ -1,7 +1,7 @@
 /* global google, ejs, validateInput, setValid, initialiseBoundaries, getZone */
 // Constants
-const managementBaseUrl = 'http://localhost:5000';
-// const managementBaseUrl = 'https://whisk-management.herokuapp.com';
+// const managementBaseUrl = 'http://localhost:5000';
+const managementBaseUrl = 'https://whisk-management.herokuapp.com';
 const templates = {
   buttonRow: `<% buttons.forEach((button) => { %>
 <button type="button" class="btn <%
@@ -30,9 +30,9 @@ function getDetailsFromHtmlId(htmlId, options = {}) {
   if (htmlId == null) {
     return { field: undefined, id: undefined };
   }
-  let [field, id] = htmlId.split('-');
-  const numberId = parseInt(id, 10);
-  id = Number.isNaN(numberId) || options.noConvert === true ? id : numberId;
+  const [field, rawId] = htmlId.split('-');
+  const numberId = parseInt(rawId, 10);
+  let id = Number.isNaN(numberId) || options.noConvert === true ? rawId : numberId;
   id = id == null ? null : id;
   return {
     field,
@@ -52,6 +52,7 @@ function priceFormat(num, options = {}) {
 
 // List of Items
 const products = {
+  element: document.getElementById('items'),
   details: [],
   basket: [],
   update() {
@@ -87,6 +88,12 @@ const products = {
   },
   for(recipientId = null) {
     return this.details.filter((x) => x.recipient === recipientId);
+  },
+  sendToBody() {
+    this.element.value = JSON.stringify(this.details);
+  },
+  getFromBody() {
+    this.details = JSON.parse(this.element.value);
   }
 };
 
@@ -109,6 +116,8 @@ const recipients = {
     return id;
   },
   update() {
+    products.update();
+
     // If purchaser is recipient, set id array to null
     const idArray = this.ids.length === 0 ? [null] : this.ids;
 
@@ -169,8 +178,8 @@ function isVisible(element) {
 }
 
 // Reveal correct delivery elements
-function showDeliveryElement(type) {
-  switch (type) {
+function showDeliveryElement() {
+  switch (window.deliveryType) {
     case 'delivery':
       show(['#user-delivery']);
       hide(['#user-collection', '#split-delivery-buttons', 'fieldset[id^="recipient"']);
@@ -391,7 +400,7 @@ function updateButtonRow() {
       });
     });
   });
-  document.getElementById('items').value = JSON.stringify(products.details);
+  products.sendToBody();
 }
 
 function removeRecipient(id) {
@@ -455,6 +464,14 @@ function addNewRecipient() {
   });
 }
 
+// When using split-delivery, ensure no items are unaccounted
+function validateAllItemsAccountedFor() {
+  if (window.deliveryType === 'split-delivery') {
+    return products.for(null).length === 0;
+  }
+  return true;
+}
+
 function validateAllInputs() {
   let valid = true;
   const elementsToValidate = [
@@ -464,6 +481,8 @@ function validateAllInputs() {
     'textarea[id^="items-to-deliver"]',
     'input[id^="address"]'
   ];
+
+  // Validate all visible elements
   const elements = document.querySelectorAll(elementsToValidate);
   for (let i = 0; i < elements.length; i += 1) {
     if (isVisible(elements[i])) {
@@ -473,7 +492,7 @@ function validateAllInputs() {
         : validateInput(elements[i].id) && valid;
     }
   }
-  return valid;
+  return validateAllItemsAccountedFor() && valid;
 }
 
 function touchAllAddresses() {
@@ -596,7 +615,8 @@ document.addEventListener('google-api-loaded', () => {
   for (let i = 0; i < deliveryButtons.length; i += 1) {
     deliveryButtons[i].addEventListener('click', () => {
       const { id } = deliveryButtons[i];
-      showDeliveryElement(id);
+      window.deliveryType = id;
+      showDeliveryElement();
       if (id === 'split-delivery' && recipients.isEmpty()) {
         addNewRecipient();
       }
@@ -663,7 +683,7 @@ document.addEventListener('google-api-loaded', () => {
   // Check if form is posted
   if (window.post) {
     if (window.deliveryType === 'split-delivery') {
-      products.details = JSON.parse(document.getElementById('items').value);
+      products.getFromBody();
       recipients.getFromBody();
       updateButtonRow();
       updateTextAreas();

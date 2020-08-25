@@ -77,14 +77,15 @@
       <legend>What would you like to buy?</legend><%
 
       for (const product of Object.values(apiResponse.products)) {
+        const quantity = parseInt(body[`quantity-${product._id}`], 10) || 0;
         product.deliverableZone = product.delivery.reduce((a, zone) => zone.deliverable ? zone.zone : a); %>
       <div class="form-group row">
         <label class="col-sm-4" for="quantity-<%=product._id %>"><%=product.name %></label>
         <div class="col-sm-2 form-group">
-          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-name="<%=product.name %>" data-deliverable-zone="<%=product.deliverableZone %>"><%
+          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-name="<%=product.name %>" data-brand="<%=product.brand %>" data-category="<%=product.category %>" data-price="<%=priceFormat(product.grossPrice, { includeSymbol: false }) %>" data-deliverable-zone="<%=product.deliverableZone %>" data-quantity="<%=quantity %>"><%
             for (let i = 0; i < 10; i += 1) { %>
             <option value="<%=i %>"<% 
-              if (body[`quantity-${product._id}`] && parseInt(body[`quantity-${product._id}`], 10) === i) { %> selected<% }
+              if (quantity === i) { %> selected<% }
             %>><%=i %></option><% } %>
           </select>
         </div>

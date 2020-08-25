@@ -1,4 +1,4 @@
-/* global google, ejs, validateInput, setValid, initialiseBoundaries, getZone */
+/* global dataLayer, google, ejs, validateInput, setValid, initialiseBoundaries, getZone */
 // Constants
 // const managementBaseUrl = 'http://localhost:5000';
 const managementBaseUrl = 'https://whisk-management.herokuapp.com';
@@ -554,6 +554,43 @@ function updateProductAvailability() {
   });
 }
 
+function createCartTag(element, quantity) {
+  const cartUpdate = {
+    ecommerce: {
+      currencyCode: 'SEK'
+    }
+  };
+  const [, id] = element.id.split('-');
+  let type;
+  if (quantity > 0) {
+    cartUpdate.event = 'addToCart';
+    type = 'add';
+  } else if (quantity < 0) {
+    cartUpdate.event = 'removeFromCart';
+    type = 'remove';
+  } else {
+    return;
+  }
+  cartUpdate.ecommerce[type] = {
+    products: [{
+      id,
+      name: element.getAttribute('data-name'),
+      brand: element.getAttribute('data-brand'),
+      category: element.getAttribute('data-category'),
+      price: parseInt(element.getAttribute('data-price'), 10),
+      quantity: Math.abs(quantity)
+    }]
+  };
+  dataLayer.push(cartUpdate);
+}
+
+function analyticsShoppingCartEvent(element) {
+  const oldQuantity = parseInt(element.getAttribute('data-quantity'), 10);
+  const quantity = parseInt(element.value, 10);
+  element.setAttribute('data-quantity', quantity);
+  createCartTag(element, quantity - oldQuantity);
+}
+
 // On Google API Loaded...
 document.addEventListener('google-api-loaded', () => {
   initialiseBoundaries();
@@ -577,6 +614,7 @@ document.addEventListener('google-api-loaded', () => {
   const quantityElements = document.querySelectorAll('select[id^="quantity-"]');
   for (let i = 0; i < quantityElements.length; i += 1) {
     quantityElements[i].addEventListener('change', () => {
+      analyticsShoppingCartEvent(quantityElements[i]);
       products.update();
       updateButtonRow();
       setAddRemoveRecipientStatus();

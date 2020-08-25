@@ -5,15 +5,14 @@ const moment = require('moment-timezone');
 // Format price from stored öre to krona
 function priceFormat(num, userOptions = {}) {
   const options = {
-    includeSymbol: userOptions.includeSymbol || true,
     includeOre: userOptions.includeOre || false
-  }
+  };
   let str = (num / 100).toLocaleString(undefined, {
     minimumFractionDigits: options.includeOre ? 2 : 0,
     maximumFractionDigits: options.includeOre ? 2 : 0
   });
   str = str.replace(',', '');
-  str += options.includeSymbol ? ' SEK' : '';
+  str += userOptions.includeSymbol === false ? '' : ' SEK';
   return str;
 }
 

@@ -69,6 +69,23 @@ function whiskController() {
     }
   }
 
+  function analyticsObject(type, product) {
+    switch (type) {
+      case 'productFieldObject':
+        return {
+          id: product.id,
+          name: product.name,
+          brand: product.brand,
+          category: product.category,
+          price: product.price / 100,
+          quantity: product.quantity
+        };
+
+      default:
+        return {};
+    }
+  }
+
   // Function to generate a dataLayer object for GTM tracking
   function generateDataLayer(statement, event, id) {
     const { products } = statement;
@@ -81,26 +98,33 @@ function whiskController() {
         }
       }
     };
-    products.forEach((product) => {
-      dataLayer.ecommerce[event].products.push({
-        name: product.name,
-        id: product.id,
-        price: product.price / 100,
-        quantity: product.quantity
-      });
-    });
-    if (event === 'purchase') {
-      dataLayer.ecommerce.purchase.actionField = {
-        id,
-        revenue: statement.bottomLine.total / 100,
-        tax: statement.bottomLine.totalMoms / 100,
-        shipping: statement.bottomLine.deliveryCost / 100
-      };
-    } else if (event === 'checkout') {
-      dataLayer.ecommerce.checkout.actionField = {
-        step: 1
-      };
+    let dataType = '';
+    switch (event) {
+      case 'checkout':
+        dataType = 'productFieldObject';
+        dataLayer.ecommerce.checkout.actionField = {
+          step: 1
+        };
+        break;
+
+      case 'purchase':
+        dataType = 'productFieldObject';
+        dataLayer.ecommerce.purchase.actionField = {
+          id,
+          revenue: statement.bottomLine.total / 100,
+          tax: statement.bottomLine.totalMoms / 100,
+          shipping: statement.bottomLine.deliveryCost / 100
+        };
+        break;
+
+      default:
+        break;
     }
+    products.forEach((product) => {
+      dataLayer.ecommerce[event].products
+        .push(analyticsObject(dataType, product));
+    });
+    
     return JSON.stringify(dataLayer);
   }
 

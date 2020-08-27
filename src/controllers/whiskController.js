@@ -115,6 +115,9 @@ function whiskController() {
           tax: statement.bottomLine.totalMoms / 100,
           shipping: statement.bottomLine.deliveryCost / 100
         };
+        if (statement.rebateCodes.length > 0) {
+          dataLayer.ecommerce.purchase.actionField.coupon = statement.rebateCodes.join(',')
+        }
         break;
 
       default:
@@ -124,7 +127,7 @@ function whiskController() {
       dataLayer.ecommerce[event].products
         .push(analyticsObject(dataType, product));
     });
-    
+
     return JSON.stringify(dataLayer);
   }
 

@@ -712,7 +712,7 @@ document.addEventListener('google-api-loaded', () => {
         rebateMessage.innerHTML = 'Code Applied!';
         updatePrice();
       } else {
-        rebateMessage.innerHTML = 'Invalid Code';
+        rebateMessage.innerHTML = data.message;
       }
     }).catch(() => {
       rebateMessage.innerHTML = 'There was an error looking up your code';

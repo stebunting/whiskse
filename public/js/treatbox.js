@@ -254,9 +254,9 @@ function updatePrice() {
         document.getElementById('food-moms').innerHTML = priceFormat(data.bottomLine.foodMoms, { includeOre: true });
         document.getElementById('delivery-cost').innerHTML = priceFormat(data.bottomLine.deliveryCost);
         document.getElementById('delivery-moms').innerHTML = priceFormat(data.bottomLine.deliveryMoms, { includeOre: true });
-        if (data.discount) {
-          document.getElementById('discount-amount').innerHTML = priceFormat(data.discount.amount);
-          document.getElementById('discount-moms').innerHTML = priceFormat(data.discount.moms, { includeOre: true });
+        if (data.bottomLine.discount > 0) {
+          document.getElementById('discount-amount').innerHTML = priceFormat(data.bottomLine.discount);
+          document.getElementById('discount-moms').innerHTML = priceFormat(data.bottomLine.discountMoms, { includeOre: true });
           document.getElementById('discount-row').classList.remove('discount-row-hidden');
         }
         document.getElementById('total-cost').innerHTML = priceFormat(data.bottomLine.total);
@@ -519,7 +519,7 @@ async function lookupRebateCode(code) {
   const data = await response.json();
   if (data.valid) {
     switch (data.code.type) {
-      case 'zone3delivery': {
+      case 'zone3Delivery': {
         const elements = document.querySelectorAll('select[id^="quantity-"]');
         for (let i = 0; i < elements.length; i += 1) {
           if (elements[i].getAttribute('data-deliverable-zone') === '2') {
@@ -531,7 +531,8 @@ async function lookupRebateCode(code) {
         break;
       }
 
-      case 'costprice':
+      case 'costPrice':
+      case 'discountPercent':
         updatePrice();
         break;
 

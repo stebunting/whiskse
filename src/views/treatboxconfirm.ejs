@@ -132,10 +132,10 @@ switch (body['delivery-type']) {
       <th class="order-total" colspan="3" scope="row">Delivery Cost</th>
       <td id="delivery-total" class="order-subtotal"><%=priceFormat(statement.bottomLine.deliveryCost) %></td>
     </tr><%
-    if (statement.discount) { %>
+    if (statement.bottomLine.discount > 0) { %>
     <tr>
       <th class="order-total" colspan="3" scope="row">Discount</th>
-      <td id="discount-amount" class="order-discount"><%=priceFormat(statement.discount.amount) %></td>
+      <td id="discount-amount" class="order-discount"><%=priceFormat(statement.bottomLine.discount) %></td>
     </tr>
     <% } %>
     <tr>

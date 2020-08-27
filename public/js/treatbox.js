@@ -245,7 +245,7 @@ function updatePrice() {
     body: JSON.stringify({
       basket: products.basket,
       recipients: recipients.recipients,
-      codes: Array.from(codes)
+      codes: JSON.stringify(Array.from(codes))
     })
   }).then((response) => response.json())
     .then((data) => {
@@ -254,6 +254,11 @@ function updatePrice() {
         document.getElementById('food-moms').innerHTML = priceFormat(data.bottomLine.foodMoms, { includeOre: true });
         document.getElementById('delivery-cost').innerHTML = priceFormat(data.bottomLine.deliveryCost);
         document.getElementById('delivery-moms').innerHTML = priceFormat(data.bottomLine.deliveryMoms, { includeOre: true });
+        if (data.discount) {
+          document.getElementById('discount-amount').innerHTML = priceFormat(data.discount.amount);
+          document.getElementById('discount-moms').innerHTML = priceFormat(data.discount.moms, { includeOre: true });
+          document.getElementById('discount-row').classList.remove('discount-row-hidden');
+        }
         document.getElementById('total-cost').innerHTML = priceFormat(data.bottomLine.total);
         setAddressMessages(data.delivery);
       }

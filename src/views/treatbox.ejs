@@ -26,17 +26,22 @@
   </ul>
 
   <h3 class="treatbox-info">ORDER DEADLINES</h3>
-  <p>Veggie Box & Combo Box - 9am Saturday // Treat Box - 10am Tuesday</p>
+  <p>Veggie Box & Combo Box - 9am Saturday // Treat Box - 9am Tuesday</p>
 
-  <h3 class="treatbox-info">PICK UP AND DELIVERY</h3>
-  <p>
-    Delivery is only available for Treat Boxes and Combo boxes (except for specific locations). Veggie Boxes can be picked up at our store at Vikingagatan 18 between 10:30-11:30 on Wednesdays.<br />
-    Delivery for Zone 1 is free. There is an additional 50kr charge to cover delivery to Zone 2.<br />
-    (Please see the map to see which zone the delivery falls under)
-  </p>
+  <h3 class="treatbox-info">DELIVERY</h3>
+  <p>Delivery is available for all our products.</p>
+
+  <p>Delivery for Zone 1 is free for Treat and Combo boxes.</p>
+  
+  <p>There is an additional 45kr charge for Veggie Boxes. Delivery for Zone 2 is 50kr for Treat/Combo Boxes, 70kr Veggie Boxes</p>
+  
+  <p>(Please see the map to see which zone the delivery falls under)</p>
   <div>
   	<button type="button" class="btn icon-button btn-sm" data-toggle="modal" data-target="#deliveryZoneModal"><img class="delivery-icon" src="/icons/zone-map.png" alt="Delivery Zones" /> Delivery Zones</button>
   </div>
+
+  <h3 class="treatbox-info">COLLECTION</h3>
+  <p class="bottom-paragraph">Veggie Boxes can be picked up at our store at Vikingagatan 18 between 17:00-17:30 on Tuesday and Treat Boxes on Wednesday between 10:30-11:00.</p>
 
   <div id="loading-div">
     <img class="loading-icon" src="/icons/loading.gif" alt="Loading" />
@@ -275,9 +280,19 @@
         <label class="col-sm-4">Delivery Cost:</label>
         <div class="col-sm-2">
           <span id="delivery-cost">0 SEK</span>
-          </div>
+        </div>
         <div class="col-sm-6">
           (<span id="delivery-moms">0 SEK</span> MOMs)
+        </div>
+      </div>
+
+      <div class="row discount-row-hidden" id="discount-row">
+        <label class="col-sm-4">Discount:</label>
+        <div class="col-sm-2">
+          <span id="discount-amount">0 SEK</span>
+        </div>
+        <div class="col-sm-6">
+          (<span id="discount-moms">0 SEK</span> MOMs)
         </div>
       </div>
 

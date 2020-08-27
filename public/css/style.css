@@ -609,9 +609,14 @@ select {
   text-align: right;
 }
 
-.order-price, .order-subtotal {
+.order-price, .order-subtotal, .order-discount {
   width: 25%;
   text-align: right;
+}
+
+.order-discount {
+  color: red;
+  font-weight: bold;
 }
 
 .order-total {
@@ -645,4 +650,12 @@ select {
 
 .treatbox-info {
   margin-top: 1.6em;
+}
+
+.discount-row-hidden {
+  display: none;
+}
+
+.bottom-paragraph {
+  margin-bottom: 40px;
 }

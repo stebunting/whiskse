@@ -131,7 +131,13 @@ switch (body['delivery-type']) {
     <tr>
       <th class="order-total" colspan="3" scope="row">Delivery Cost</th>
       <td id="delivery-total" class="order-subtotal"><%=priceFormat(statement.bottomLine.deliveryCost) %></td>
+    </tr><%
+    if (statement.discount) { %>
+    <tr>
+      <th class="order-total" colspan="3" scope="row">Discount</th>
+      <td id="discount-amount" class="order-discount"><%=priceFormat(statement.discount.amount) %></td>
     </tr>
+    <% } %>
     <tr>
       <th class="order-total" colspan="3" scope="row">MOMs</th>
       <td id="moms-total" class="order-subtotal"><%=priceFormat(statement.bottomLine.totalMoms, { includeOre: true }) %></td>

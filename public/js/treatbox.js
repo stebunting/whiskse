@@ -55,10 +55,12 @@ const products = {
   element: document.getElementById('items'),
   details: [],
   basket: [],
+  useCollectionDay: true,
   update() {
     const oldItems = this.details.filter((x) => x.recipient !== null);
     this.details = [];
     this.basket = [];
+    let calculateUseCollectionDay = true;
     const quantities = document.querySelectorAll('*[id^="quantity-"]');
     quantities.forEach((element) => {
       const quantity = parseInt(element.value, 10);
@@ -67,6 +69,7 @@ const products = {
       const zone = parseInt(element.getAttribute('data-deliverable-zone'), 10);
       if (quantity > 0) {
         this.basket.push({ id, name, quantity });
+        calculateUseCollectionDay = element.getAttribute('data-collection-day') === 'collection' && calculateUseCollectionDay;
       }
 
       for (let i = 0; i < quantity; i += 1) {
@@ -85,6 +88,7 @@ const products = {
         });
       }
     });
+    this.useCollectionDay = calculateUseCollectionDay;
   },
   for(recipientId = null) {
     return this.details.filter((x) => x.recipient === recipientId);
@@ -597,6 +601,25 @@ function analyticsShoppingCartEvent(element) {
   createCartTag(element, quantity - oldQuantity);
 }
 
+function setDeliveryDate() {
+  const dateCode = document.getElementById('date');
+  const selectedWeek = dateCode.options[dateCode.selectedIndex];
+
+  let text = '';
+  let deliveryType = '';
+  if (window.deliveryType !== 'collection') {
+    deliveryType = 'Delivery';
+    text = `${selectedWeek.getAttribute('data-delivery-date')} between 11:30 and 14:00`;
+  } else {
+    deliveryType = 'Collection';
+    text = products.useCollectionDay
+      ? `${selectedWeek.getAttribute('data-collection-date')} between 17:00 and 17:30`
+      : `${selectedWeek.getAttribute('data-delivery-date')} between 10:30 and 11:30`;
+  }
+  document.getElementById('date-display').value = text;
+  document.getElementById('date-display-label').innerHTML = `${deliveryType} Date/Time`;
+}
+
 // On Google API Loaded...
 document.addEventListener('google-api-loaded', () => {
   initialiseBoundaries();
@@ -614,6 +637,7 @@ document.addEventListener('google-api-loaded', () => {
   // Update product availability when date changed
   document.getElementById('date').addEventListener('change', () => {
     updateProductAvailability();
+    setDeliveryDate();
   });
 
   // Select Items
@@ -626,6 +650,7 @@ document.addEventListener('google-api-loaded', () => {
       setAddRemoveRecipientStatus();
       show(['#purchaser-details', '#delivery-details']);
       touchAllAddresses();
+      setDeliveryDate();
     });
   }
 
@@ -665,6 +690,7 @@ document.addEventListener('google-api-loaded', () => {
         addNewRecipient();
       }
       updatePrice();
+      setDeliveryDate();
     });
   }
 
@@ -707,7 +733,7 @@ document.addEventListener('google-api-loaded', () => {
     const code = document.getElementById('rebate-entry').value;
     lookupRebateCode(code).then((data) => {
       if (data.valid) {
-        codes.add(data.code.value);
+        codes.add(data.code.code);
         document.getElementById('rebate-codes').value = JSON.stringify(Array.from(codes));
         rebateMessage.innerHTML = 'Code Applied!';
         updatePrice();

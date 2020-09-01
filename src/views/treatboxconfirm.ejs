@@ -48,12 +48,12 @@ switch (body['delivery-type']) {
   <h2>Delivery</h2>
   <table class="table table-striped table-bordered table-hover">
     <tr>
-      <th class="table-label" scope="row">Date</th>
-      <td><%=dateFormat(parseDateCode(body.date)) %></td>
-    </tr>
-    <tr>
       <th class="table-label" scope="row">Delivery</th>
       <td><%=delivery %></td>
+    </tr>
+    <tr>
+      <th class="table-label" scope="row">Date/Time</th>
+      <td><%=body['date-display'] %></td>
     </tr>
 <% if (delivery === "Collection from Whisk") { %>
     <tr>
@@ -152,12 +152,12 @@ switch (body['delivery-type']) {
 let text;
 switch (body['delivery-type']) {
   case 'collection':
-    text = `Please note that your items must be picked up from our store at Vikingagatan 18 between 10:30am and 11:30am on ${dateFormat(parseDateCode(body.date))}.`;
+    text = `Please note that your items must be picked up from our store at Vikingagatan 18 on ${body['date-display']}.`;
     break;
 
   case 'delivery':
   case 'split-delivery':
-    text = `Your items will be delivered on ${dateFormat(parseDateCode(body.date))} between Midday and 3pm`;
+    text = `Your items will be delivered on ${body['date-display']}.`;
     break;
   }
 %>  <p><%=text %></p>

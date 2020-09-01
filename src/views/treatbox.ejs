@@ -37,7 +37,10 @@
   
   <p>(Please see the map to see which zone the delivery falls under)</p>
   <div>
-  	<button type="button" class="btn icon-button btn-sm" data-toggle="modal" data-target="#deliveryZoneModal"><img class="delivery-icon" src="/icons/zone-map.png" alt="Delivery Zones" /> Delivery Zones</button>
+    <button type="button" class="btn icon-button btn-sm" data-toggle="modal" data-target="#deliveryZoneModal">
+      <img class="delivery-icon" src="/icons/zone-map.png" alt="Delivery Zones" />
+      &nbsp;Delivery Zones
+    </button>
   </div>
 
   <h3 class="treatbox-info">COLLECTION</h3>
@@ -67,10 +70,10 @@
           <select class="form-control form-control-sm" id="date" name="date"><%
             for (const [code, date] of Object.entries(apiResponse.timeframe)) {
               if (date.deadline.normal.notPassed) { %>
-            <option value="<%=code %>" <%
+            <option data-delivery-date="<%=dateFormat(date.delivery, { format: 'shortWording' }) %>" data-collection-date="<%=dateFormat(date.collection, { format: 'shortWording' }) %>" value="<%=code %>" <%
                 if (body.date === code) {
               %> selected<%
-                } %>><%=dateFormat(date.delivery) %></option><%
+                } %>><%=dateFormat(date.delivery, { format: 'week' }) %></option><%
               }
             } %>
           </select>
@@ -85,9 +88,9 @@
         const quantity = parseInt(body[`quantity-${product._id}`], 10) || 0;
         product.deliverableZone = product.delivery.reduce((a, zone) => zone.deliverable ? zone.zone : a); %>
       <div class="form-group row">
-        <label class="col-sm-4" for="quantity-<%=product._id %>"><%=product.name %></label>
-        <div class="col-sm-2 form-group">
-          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-name="<%=product.name %>" data-brand="<%=product.brand %>" data-category="<%=product.category %>" data-price="<%=priceFormat(product.grossPrice, { includeSymbol: false }) %>" data-deliverable-zone="<%=product.deliverableZone %>" data-quantity="<%=quantity %>"><%
+        <label class="col-sm-4 col-form-label" for="quantity-<%=product._id %>"><%=product.name %></label>
+        <div class="col-sm-2">
+          <select class="form-control form-control-sm" id="quantity-<%=product._id %>" name="quantity-<%=product._id %>" data-name="<%=product.name %>" data-brand="<%=product.brand %>" data-category="<%=product.category %>" data-price="<%=priceFormat(product.grossPrice, { includeSymbol: false }) %>" data-deliverable-zone="<%=product.deliverableZone %>" data-quantity="<%=quantity %>" data-collection-day="<%=product.collectionDay %>"><%
             for (let i = 0; i < 10; i += 1) { %>
             <option value="<%=i %>"<% 
               if (quantity === i) { %> selected<% }
@@ -99,7 +102,7 @@
         } %>
     </fieldset>
 
-    <fieldset class="form-group hideable hidden" id="purchaser-details">
+    <fieldset class="hideable hidden" id="purchaser-details">
       <legend>Your details</legend>
       
       <div class="form-group row">
@@ -142,6 +145,13 @@
             <label class="form-check-label" for="split-delivery">Delivery to another person / multiple people</label>
           </div>
           <button type="button" class="btn icon-button btn-sm" data-toggle="modal" data-target="#deliveryZoneModal"><img class="delivery-icon" src="/icons/zone-map.png" alt="Delivery Zones" /> Delivery Zones</button>
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <label for="date-display" id="date-display-label" class="col-sm-4 col-form-label">Date</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control-plaintext" id="date-display" name="date-display" autocomplete="off" readonly />
         </div>
       </div>
       

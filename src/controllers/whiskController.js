@@ -4,7 +4,7 @@ const tag = 'whiskse:whiskController';
 // Requirements
 const axios = require('axios');
 const debug = require('debug')(tag);
-const { priceFormat, dateFormat, parseDateCode } = require('../functions/helper');
+const { priceFormat, dateFormat } = require('../functions/helper');
 
 // Constants
 const managementBaseUrl = process.env.MANAGEMENT_BASE_URL;
@@ -116,7 +116,7 @@ function whiskController() {
           shipping: statement.bottomLine.deliveryCost / 100
         };
         if (statement.rebateCodes.length > 0) {
-          dataLayer.ecommerce.purchase.actionField.coupon = statement.rebateCodes.join(',')
+          dataLayer.ecommerce.purchase.actionField.coupon = statement.rebateCodes.join(',');
         }
         break;
 
@@ -199,8 +199,6 @@ function whiskController() {
       query: req.query,
       statement,
       priceFormat,
-      dateFormat,
-      parseDateCode,
       payload,
       googleDataLayer
     });

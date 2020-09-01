@@ -412,15 +412,6 @@ ul.links li a:link, ul.links li a:visited, ul.links li a:hover, ul.links li a:ac
   width: 12em;
 }
 
-/******************************** TREAT BOXES *********************************/
-.treatbox-form {
-  width: 640px;
-  height: 2980px;
-  border: 0px;
-  margin: auto;
-  display: block;
-}
-
 /*********************************** FOOTER ***********************************/
 .footer {
   padding: 60px 30px 20px;
@@ -521,9 +512,17 @@ ul.links li a:link, ul.links li a:visited, ul.links li a:hover, ul.links li a:ac
 	}
 }
 
-/* NEW FORM */
+/******************************** TREAT BOXES *********************************/
+.treatbox-form-header {
+  text-align: center;
+}
+
+.treatbox-info {
+  margin-top: 1.6em;
+}
+
 fieldset {
-  border: 1px black solid;
+  border: 1px #666 solid;
   border-radius: 10px;
   padding: 10px;
 }
@@ -533,9 +532,9 @@ legend.col-form-label {
 }
 
 legend {
-    width: auto;
-    padding: 0 10px;
-    border-bottom: none;
+  width: auto;
+  padding: 0 10px;
+  border-bottom: none;
 }
 
 .item-button {
@@ -642,14 +641,6 @@ select {
 
 #rebate-message {
   color: #FF0000;
-}
-
-.treatbox-form-header {
-  text-align: center;
-}
-
-.treatbox-info {
-  margin-top: 1.6em;
 }
 
 .discount-row-hidden {

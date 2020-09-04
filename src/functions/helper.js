@@ -16,11 +16,21 @@ function priceFormat(num, userOptions = {}) {
 }
 
 function dateFormat(date, options = {}) {
+  const dateMoment = moment(date).tz('Europe/Stockholm');
   let format;
   switch (options.format) {
-    case 'week':
-      format = '[Week] w';
+    case 'week': {
+      const startOfWeek = dateFormat(
+        dateMoment.startOf('isoWeek').format(),
+        { format: 'shortDate' }
+      );
+      const endOfWeek = dateFormat(
+        dateMoment.endOf('isoWeek').format(),
+        { format: 'shortDate' }
+      );
+      format = `[Week] w [(${startOfWeek} - ${endOfWeek})]`;
       break;
+    }
 
     case 'short':
       format = 'YYYY/M/D h:mm:ssa';
@@ -38,6 +48,10 @@ function dateFormat(date, options = {}) {
       format = 'h:mm A';
       break;
 
+    case 'shortDate':
+      format = 'D MMM';
+      break;
+
     case 'shortWording':
       format = 'dddd Do MMMM';
       break;
@@ -50,9 +64,7 @@ function dateFormat(date, options = {}) {
   if (options.includeWeek === true) {
     format += ' [(Week] w[)]';
   }
-  return moment(date)
-    .tz('Europe/Stockholm')
-    .format(format);
+  return dateMoment.format(format);
 }
 
 function parseDateCode(dateCode) {

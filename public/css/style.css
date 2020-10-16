@@ -74,6 +74,11 @@ h2 {
   font-size: 1.8em;
 }
 
+h2.alert {
+  color: #f00;
+  text-align: center;
+}
+
 h3 {
   padding-top: 0px;
   margin-bottom: 0px;

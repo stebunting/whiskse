@@ -28,7 +28,7 @@ function dateFormat(date, options = {}) {
         dateMoment.endOf('isoWeek').format(),
         { format: 'shortDate' }
       );
-      format = `[Week] w [(${startOfWeek} - ${endOfWeek})]`;
+      format = `[Week] W [(${startOfWeek} - ${endOfWeek})]`;
       break;
     }
 

@@ -18,16 +18,16 @@
   },
   "homepage": "https://github.com/stebunting/whiskse#readme",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.0",
     "body-parser": "^1.19.0",
-    "bootstrap": "^4.5.0",
-    "debug": "^4.1.1",
+    "bootstrap": "^4.5.3",
+    "debug": "^4.3.1",
     "dotenv": "^8.2.0",
-    "ejs": "^3.1.3",
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
     "jquery": "^3.5.1",
-    "moment": "^2.27.0",
-    "moment-timezone": "^0.5.31",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.32",
     "popper.js": "^1.16.1"
   },
   "nodemonConfig": {
@@ -44,9 +44,9 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^7.6.0",
-    "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-plugin-import": "^2.22.0",
-    "mocha": "^8.1.1"
+    "eslint": "^7.13.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "mocha": "^8.2.1"
   }
 }

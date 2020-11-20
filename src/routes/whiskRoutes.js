@@ -47,7 +47,7 @@ function routes() {
 
   // Redirects
   whiskRoutes.route('/store')
-    .get((req, res) => res.redirect('https://store.whisk.se'));
+    .get((req, res) => res.redirect('https://shop.whisk.se'));
 
   whiskRoutes.route('/management')
     .get((req, res) => res.redirect('https://whisk-management.herokuapp.com'));

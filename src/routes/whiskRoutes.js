@@ -46,7 +46,6 @@ function routes() {
     .get((req, res) => res.render('test/test', { googleApiKey, page: 'faq' }));
 
   // Redirects
-  // Force
   whiskRoutes.route('/store')
     .get((req, res) => res.redirect('https://shop.whisk.se'));
 

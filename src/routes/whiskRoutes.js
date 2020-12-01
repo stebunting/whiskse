@@ -4,7 +4,12 @@ const tag = 'whiskse:whiskRoutes';
 // Requirements
 const express = require('express');
 const debug = require('debug')(tag);
-const { treatboxOrderForm, treatboxConfirmation, orderPlaced } = require('../controllers/whiskController.js')();
+const {
+  wakeUpStore,
+  treatboxOrderForm,
+  treatboxConfirmation,
+  orderPlaced
+} = require('../controllers/whiskController.js')();
 
 // Constants
 const googleApiKey = process.env.GOOGLE_API_KEY;
@@ -14,7 +19,7 @@ function routes() {
   const whiskRoutes = express.Router();
 
   whiskRoutes.route('/')
-    .get((req, res) => res.render('index', { googleApiKey, page: 'index' }));
+    .get(wakeUpStore, (req, res) => res.render('index', { googleApiKey, page: 'index' }));
 
   whiskRoutes.route('/treatboxorder')
     .get(treatboxOrderForm)

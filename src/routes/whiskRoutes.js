@@ -58,6 +58,9 @@ function routes() {
     .get((req, res) => res.redirect('https://whisk-management.herokuapp.com'));
 
   // Legacy Redirects
+  whiskRoutes.route('/jul')
+    .get((req, res) => res.redirect('https://store.whisk.se/assets/docs/christmas-hamper-ingredients.pdf'));
+
   whiskRoutes.route(['/treatbox', '/treatboxes.php'])
     .get((req, res) => res.redirect('/treatboxorder'));
 

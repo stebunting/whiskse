@@ -1,43 +1,43 @@
 /********************************** GENERAL ***********************************/
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap");
 
 @font-face {
   font-family: "Bebasneue";
-  src: url("/fonts/BebasNeue-Regular.woff2") format('woff2'),
-       url("/fonts/BebasNeue-Regular.woff") format('woff'),
-       url("/fonts/BebasNeue-Regular.ttf") format('truetype'),
-       url("/fonts/BebasNeue-Regular.otf") format('opentype'),
-       url("/fonts/BebasNeue-Regular.eot") format('embedded-opentype');
+  src: url("/fonts/BebasNeue-Regular.woff2") format("woff2"),
+    url("/fonts/BebasNeue-Regular.woff") format("woff"),
+    url("/fonts/BebasNeue-Regular.ttf") format("truetype"),
+    url("/fonts/BebasNeue-Regular.otf") format("opentype"),
+    url("/fonts/BebasNeue-Regular.eot") format("embedded-opentype");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Bebasneue";
-  src: url("/fonts/BebasNeue-Bold.ttf") format('truetype'),
-       url("/fonts/BebasNeue-Bold.otf") format('opentype');
+  src: url("/fonts/BebasNeue-Bold.ttf") format("truetype"),
+    url("/fonts/BebasNeue-Bold.otf") format("opentype");
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Bebasneue";
-  src: url("/fonts/BebasNeue-Light.ttf") format('truetype'),
-       url("/fonts/BebasNeue-Light.otf") format('opentype');
+  src: url("/fonts/BebasNeue-Light.ttf") format("truetype"),
+    url("/fonts/BebasNeue-Light.otf") format("opentype");
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
   font-family: "Bebasneue Thin";
-  src: url("/fonts/BebasNeue-Thin.ttf") format('truetype'),
-       url("/fonts/BebasNeue-Thin.otf") format('opentype');
+  src: url("/fonts/BebasNeue-Thin.ttf") format("truetype"),
+    url("/fonts/BebasNeue-Thin.otf") format("opentype");
   font-weight: normal;
   font-style: normal;
 }
 
 body {
-  font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+  font-family: "Open Sans", Arial, Helvetica, sans-serif;
   padding-top: 140px;
   font-size: 90%;
   color: #282828;
@@ -45,16 +45,22 @@ body {
 }
 
 .container-fluid {
-	padding: 0px 10vw;
+  padding: 0px 10vw;
 }
 
-a:link, a:hover, a:visited, a:active {
+a:link,
+a:hover,
+a:visited,
+a:active {
   color: #548c4e;
   font-weight: bold;
   text-decoration: none;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: Bebasneue, Arial, Helvetica, sans-serif;
   font-weight: bold;
 }
@@ -76,7 +82,14 @@ h2 {
 
 h2.alert {
   color: #f00;
+  padding-bottom: 0;
   text-align: center;
+}
+
+h3.alert {
+  margin: 0;
+  padding: 0;
+  color: orange;
 }
 
 h3 {
@@ -91,7 +104,8 @@ h4 {
   margin-bottom: 0px;
 }
 
-.btn-xl, .btn-xl:hover {
+.btn-xl,
+.btn-xl:hover {
   color: #ffffff;
   border: 2px #ffffff solid;
   padding: 20px 120px;
@@ -125,7 +139,9 @@ h4 {
   padding: 10px 10px;
 }
 
-ul.nav li.nav-item a.nav-link:link, a.nav-link:visited, a.nav-link:active {
+ul.nav li.nav-item a.nav-link:link,
+a.nav-link:visited,
+a.nav-link:active {
   color: #7c7c7c;
 }
 
@@ -188,7 +204,7 @@ span.nav-span {
 }
 
 .header1-img {
-  background-image: url('images/indexbanner1.png');
+  background-image: url("images/indexbanner1.png");
 }
 
 .header1-text {
@@ -198,7 +214,7 @@ span.nav-span {
 }
 
 .header2-img {
-  background-image: url('images/indexbanner2.png');
+  background-image: url("images/indexbanner2.png");
 }
 
 .header2-text {
@@ -227,7 +243,7 @@ span.nav-span {
 }
 
 .paral p {
-  color:#f5f5f5;
+  color: #f5f5f5;
   text-align: center;
 }
 
@@ -296,10 +312,11 @@ span.nav-span {
   padding: 50px 50px 90px;
 }
 
-@media (max-width:768px) {
-	.pricelist, .accessories {
-		padding: 20px 20px 40px;
-	}
+@media (max-width: 768px) {
+  .pricelist,
+  .accessories {
+    padding: 20px 20px 40px;
+  }
 }
 
 .pricelist-item {
@@ -365,12 +382,15 @@ span.nav-span {
 }
 
 @media (max-width: 768px) {
-	.links {
-		padding-left: 2vh;
-	}
+  .links {
+    padding-left: 2vh;
+  }
 }
 
-ul.links li a:link, ul.links li a:visited, ul.links li a:hover, ul.links li a:active {
+ul.links li a:link,
+ul.links li a:visited,
+ul.links li a:hover,
+ul.links li a:active {
   color: #ffffff;
 }
 
@@ -404,9 +424,9 @@ ul.links li a:link, ul.links li a:visited, ul.links li a:hover, ul.links li a:ac
 }
 
 @media (max-width: 768px) {
-	.card {
-		padding: 0px;
-	}
+  .card {
+    padding: 0px;
+  }
 }
 
 .card-top {
@@ -459,21 +479,21 @@ ul.links li a:link, ul.links li a:visited, ul.links li a:hover, ul.links li a:ac
 #instagram {
   width: 29px;
   padding: 2px 7px;
-  background:transparent url('/icons/instagram_bw.png') center top no-repeat;
+  background: transparent url("/icons/instagram_bw.png") center top no-repeat;
 }
 
 #instagram:hover {
-  background-image: url('/icons/instagram_colour.png');
+  background-image: url("/icons/instagram_colour.png");
 }
 
 #facebook {
   width: 29px;
   padding: 2px 7px;
-  background:transparent url('/icons/facebook_bw.png') center top no-repeat;
+  background: transparent url("/icons/facebook_bw.png") center top no-repeat;
 }
 
 #facebook:hover {
-  background-image: url('/icons/facebook_colour.png');
+  background-image: url("/icons/facebook_colour.png");
 }
 
 .instagram-thumb {
@@ -501,20 +521,20 @@ ul.links li a:link, ul.links li a:visited, ul.links li a:hover, ul.links li a:ac
 }
 
 @media (max-width: 768px) {
-	.latest-instagram {
-  	display: -ms-flexbox !important;
-  	display: flex !important;
-		-ms-flex-pack: center !important;
-		justify-content: center !important;
-	}
+  .latest-instagram {
+    display: -ms-flexbox !important;
+    display: flex !important;
+    -ms-flex-pack: center !important;
+    justify-content: center !important;
+  }
 
-	.latest-instagram-holder {
-		padding-top: 4vh;
-	}
+  .latest-instagram-holder {
+    padding-top: 4vh;
+  }
 
-	.green-hosting {
-		padding-top: 4vh;
-	}
+  .green-hosting {
+    padding-top: 4vh;
+  }
 }
 
 /******************************** TREAT BOXES *********************************/
@@ -613,7 +633,9 @@ select {
   text-align: right;
 }
 
-.order-price, .order-subtotal, .order-discount {
+.order-price,
+.order-subtotal,
+.order-discount {
   width: 25%;
   text-align: right;
 }
@@ -636,7 +658,7 @@ select {
   padding: 0;
   list-style-type: none;
   font-weight: bold;
-  color: #FF0000;
+  color: #ff0000;
 }
 
 .open-swish {
@@ -645,7 +667,7 @@ select {
 }
 
 #rebate-message {
-  color: #FF0000;
+  color: #ff0000;
 }
 
 .discount-row-hidden {

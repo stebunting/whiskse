@@ -18,19 +18,21 @@ const googleApiKey = process.env.GOOGLE_API_KEY;
 function routes() {
   const whiskRoutes = express.Router();
 
+  const redirectToMain = (req, res) => res.redirect('/');
+
   whiskRoutes.route('/')
     .get(wakeUpStore, (req, res) => res.render('index', { googleApiKey, page: 'index' }));
 
-  whiskRoutes.route('/treatboxorder')
-    .get(treatboxOrderForm)
-    .post(treatboxOrderForm);
+  whiskRoutes.route('/treatboxorder').get(redirectToMain);
+  // .get(treatboxOrderForm)
+  // .post(treatboxOrderForm);
 
-  whiskRoutes.route('/treatboxconfirm')
-    .get((req, res) => res.redirect('/treatboxorder'))
-    .post(treatboxConfirmation);
+  whiskRoutes.route('/treatboxconfirm').get(redirectToMain);
+  // .get((req, res) => res.redirect('/treatboxorder'))
+  // .post(treatboxConfirmation);
 
-  whiskRoutes.route('/orderplaced')
-    .post(orderPlaced);
+  whiskRoutes.route('/orderplaced').get(redirectToMain);
+  // .post(orderPlaced);
 
   whiskRoutes.route('/menu')
     .get((req, res) => res.render('menu', { googleApiKey, page: 'menu' }));
@@ -47,8 +49,8 @@ function routes() {
   whiskRoutes.route('/sitemap')
     .get((req, res) => res.render('sitemap'));
 
-  whiskRoutes.route('/test')
-    .get((req, res) => res.render('test/test', { googleApiKey, page: 'faq' }));
+  // whiskRoutes.route('/test')
+  //   .get((req, res) => res.render('test/test', { googleApiKey, page: 'faq' }));
 
   // Redirects
   whiskRoutes.route('/store')

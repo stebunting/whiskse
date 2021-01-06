@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/stebunting/whiskse#readme",
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "bootstrap": "^4.5.0",
     "debug": "^4.3.1",
@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^7.15.0",
+    "eslint": "^7.17.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
     "mocha": "^8.2.1"

@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14.x'
+    - run: npm ci
+    - run: npm run lint
+    - run: npm test
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.ID_RSA_GITHUB }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+    - run: git remote add cpanel ssh://whiskse@whisk.se:22007/home/whiskse/app
+    - run: git push cpanel -f

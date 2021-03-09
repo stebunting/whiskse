@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node app",
-    "dev": "nodemon app"
+    "dev": "nodemon app",
+    "lint": "eslint src/",
+    "test": "exit 0"
   },
   "repository": {
     "type": "git",
@@ -16,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/stebunting/whiskse/issues"
   },
-  "homepage": "https://github.com/stebunting/whiskse#readme",
+  "homepage": "https://whisk.se/",
   "dependencies": {
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",

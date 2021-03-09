@@ -1,15 +1,6 @@
-// File Tag
-const tag = 'whiskse:whiskRoutes';
-
 // Requirements
 const express = require('express');
-const debug = require('debug')(tag);
-const {
-  wakeUpStore,
-  treatboxOrderForm,
-  treatboxConfirmation,
-  orderPlaced
-} = require('../controllers/whiskController.js')();
+const { wakeUpStore } = require('../controllers/whiskController.js')();
 
 // Constants
 const googleApiKey = process.env.GOOGLE_API_KEY;

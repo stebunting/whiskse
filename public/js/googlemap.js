@@ -48,12 +48,12 @@ function initMap() {
   ]);
 
   // Define centre
-  const address = { lat: 59.34100, lng: 18.03327 };
+  const address = { lat: 59.341579, lng: 18.110855 };
 
   // Create Map
   const map = new google.maps.Map(
     document.getElementById('map'), {
-      zoom: 15,
+      zoom: 13,
       center: address,
       disableDefaultUI: true,
       mapTypeControlOptions: {
@@ -67,11 +67,11 @@ function initMap() {
   map.setMapTypeId('styled_map');
 
   // Add marker
-  const marker = new google.maps.Marker({
-    position: address,
-    icon: {
-      url: 'https://maps.google.com/mapfiles/ms/icons/pink-dot.png'
-    },
-    map
-  });
+  // const marker = new google.maps.Marker({
+  //   position: address,
+  //   icon: {
+  //     url: 'https://maps.google.com/mapfiles/ms/icons/pink-dot.png'
+  //   },
+  //   map
+  // });
 }

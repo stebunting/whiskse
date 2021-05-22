@@ -65,13 +65,4 @@ function initMap() {
   // Apply style
   map.mapTypes.set('styled_map', mapStyle);
   map.setMapTypeId('styled_map');
-
-  // Add marker
-  // const marker = new google.maps.Marker({
-  //   position: address,
-  //   icon: {
-  //     url: 'https://maps.google.com/mapfiles/ms/icons/pink-dot.png'
-  //   },
-  //   map
-  // });
 }

@@ -1,6 +1,6 @@
 // Requirements
 const express = require('express');
-const { wakeUpStore } = require('../controllers/whiskController.js')();
+const { wakeUpStore } = require('../controllers/whiskController')();
 
 // Constants
 const googleApiKey = process.env.GOOGLE_API_KEY;

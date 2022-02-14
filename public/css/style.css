@@ -507,17 +507,18 @@ ul.links li a:active {
   margin-right: 5px;
 }
 
-#map {
-  width: 100%;
-  height: 200px;
-}
-
 .green-hosting {
   width: 100%;
   font-size: 0.7em;
   color: #505050;
   font-style: italic;
   text-align: right;
+}
+
+.latest-instagram {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
 }
 
 @media (max-width: 768px) {

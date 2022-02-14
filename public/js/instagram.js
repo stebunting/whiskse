@@ -2,7 +2,7 @@
 const template = `<%
 data.forEach((item, index) => {
   if (index % 3 === 0) { %>
-<div class="row latest-instagram"><% } %>
+<div class="latest-instagram"><% } %>
   <a href="<%=item.permalink %>" target="_blank" rel="external">
     <img class="instagram-thumb" src="<%=item.media_url %>" alt="<%=item.caption %>" />
   </a><%

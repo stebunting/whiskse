@@ -1,6 +1,5 @@
 // Requirements
 const express = require('express');
-const { wakeUpStore } = require('../controllers/whiskController')();
 
 // Constants
 const googleApiKey = process.env.GOOGLE_API_KEY;
@@ -12,7 +11,7 @@ function routes() {
   const redirectToMain = (req, res) => res.redirect('/');
 
   whiskRoutes.route('/')
-    .get(wakeUpStore, (req, res) => res.render('index', { googleApiKey, page: 'index' }));
+    .get((req, res) => res.render('index', { googleApiKey, page: 'index' }));
 
   whiskRoutes.route('/treatboxorder').get(redirectToMain);
   // .get(treatboxOrderForm)
@@ -44,16 +43,10 @@ function routes() {
   //   .get((req, res) => res.render('test/test', { googleApiKey, page: 'faq' }));
 
   // Redirects
-  whiskRoutes.route('/store')
-    .get((req, res) => res.redirect('https://store.whisk.se'));
-
   whiskRoutes.route('/management')
     .get((req, res) => res.redirect('https://whisk-management.herokuapp.com'));
 
   // Legacy Redirects
-  whiskRoutes.route('/jul')
-    .get((req, res) => res.redirect('https://store.whisk.se/assets/docs/christmas-hamper-ingredients.pdf'));
-
   whiskRoutes.route(['/treatbox', '/treatboxes.php'])
     .get((req, res) => res.redirect('/treatboxorder'));
 

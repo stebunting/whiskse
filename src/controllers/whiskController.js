@@ -217,16 +217,10 @@ function whiskController() {
     });
   }
 
-  function wakeUpStore(req, res, next) {
-    axios.get('https://whisk-store-api.herokuapp.com/wakeup');
-    next();
-  }
-
   return {
     treatboxOrderForm,
     treatboxConfirmation,
-    orderPlaced,
-    wakeUpStore
+    orderPlaced
   };
 }
 
